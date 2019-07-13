@@ -1,26 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import GlobalFilter from "./components/GlobalFilters/GlobalFilter";
+import ExportModal from "./components/ExportModal/ExportModal";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      modalProps: { open: false },
+      globalFilters: { open: false }
+    };
+  }
+
+  openCloseExportModal = () => {
+    this.setState = {
+      modalProps: {
+        oepn: !this.state.modalProps.open
+      }
+    };
+  };
+
+  render() {
+    return (
+      <div className="App">
+        <button className="primary-button" onClick={this.openCloseExportModal}>
+          Open Export Modal
+        </button>
+        <button className="primary-button" onClick={this.openCloseExportModal}>
+          Open Export Modal
+        </button>
+        {/* <ExportModal modalProps={this.state.modalProps} /> */}
+        <GlobalFilter
+          enabaleMemberSearch
+          enableDateSearch
+          enableMonthRangeSearch
+        />
+      </div>
+    );
+  }
 }
 
 export default App;
