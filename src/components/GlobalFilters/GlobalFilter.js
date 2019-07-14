@@ -1,10 +1,8 @@
-import React, { Component, Fragment } from 'react';
-import {faTimes} from '@fortawesome/free-solid-svg-icons';
-import {Drawer, ListItem, Chip, Button } from '@material-ui/core';
-import { fontAwesomeIcon, FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { createMuiTheme } from '@material-ui/core';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { createMuiTheme, Drawer } from '@material-ui/core';
 import { withStyles } from '@material-ui/styles';
-import CategorySearch from './CategorySearch';
+import React, { Component, Fragment } from 'react';
 
 const theme = createMuiTheme({
     typography: {
@@ -38,47 +36,291 @@ const styles = theme => ({
     FilterBody: {
         height: '100%',
         overflow: 'auto'
+    },
+    globalFilterContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid tomato',
+        padding: '5px',
+        margin: '50px'
+    },
+    topContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        margin: '15px',
+        padding: '10px',
+        border: '1px solid lightgreen'
+    },
+    leftContainer: {
+        width: '30%',
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid #ccc'
+    },
+    leftContainerItem: {
+        minHeight: '40px',
+        lineHeight: '40px',
+        border: '1px solid #ccc',
+        padding: '0 10px',
+        cursor: 'pointer',
+        '&:hover': {
+            color: 'red'
+        }
+    },
+    selectedCategory: {
+        backgroundColor: '#ccc',
+        color: 'red'
+    },
+    rightContainer: {
+        width: '70%',
+        margin: '0 5px',
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid #ccc'
+    },
+    rightContainerItem: {
+        minHeight: '40px',
+        lineHeight: '40px',
+        border: '1px solid #ccc',
+        padding: '0 15px',
+        cursor: 'pointer'
+    },
+    bottomContainer: {
+        border: '1px solid dodgerblue',
+        margin: '15px',
+        padding: '10px'
+    },
+    selectedFilterChip: {
+        border: '1px solid red',
+        borderRadius: '3px',
+        padding: '5px',
+        margin: '5px',
+        display: 'inline-block'
     }
-})
+});
 
 class GlobalFilter extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state={
-            selectedList : [],
-            globalFilterOpen: false
+
+        this.testData = [
+            {
+                organization: 'org-1',
+                product_type: 'product_type-1',
+                product_code: 'product_code-1',
+                county: 'country-1',
+                region: 'region-1'
+            },
+            {
+                organization: 'org-1',
+                product_type: 'product_type-2',
+                product_code: 'product_code-1',
+                county: 'country-1',
+                region: 'region-1'
+            },
+            {
+                organization: 'org-1',
+                product_type: 'product_type-2',
+                product_code: 'product_code-1',
+                county: 'country-1',
+                region: 'region-1'
+            },
+            {
+                organization: 'org-2',
+                product_type: 'product_type-2',
+                product_code: 'product_code-2',
+                county: 'country-2',
+                region: 'region-2'
+            },
+            {
+                organization: 'org-3',
+                product_type: 'product_type-3',
+                product_code: 'product_code-3',
+                county: 'country-3',
+                region: 'region-3'
+            },
+            {
+                organization: 'org-4',
+                product_type: 'product_type-4',
+                product_code: 'product_code-4',
+                county: 'country-4',
+                region: 'region-4'
+            }
+        ];
+
+        this.state = {
+            selectedList: [],
+            globalFilterOpen: false,
+            data: this.testData,
+            filteredData: JSON.parse(JSON.stringify(this.testData)),
+            organization: [],
+            county: [],
+            region: [],
+            product_type: [],
+            product_code: [],
+            categories: ['organization', 'county', 'region', 'product_type', 'product_code'],
+            selectedCategory: 'organization',
+            selectedFilter: []
         };
     }
+
+    componentDidMount() {
+        this.generateUniqueCategory();
+    }
+
+    generateUniqueCategory = () => {
+        let organizationSet = new Set();
+        let productCodeSet = new Set();
+        let productTypeSet = new Set();
+        let regionSet = new Set();
+        let countySet = new Set();
+
+        for (let d of this.state.filteredData) {
+            organizationSet.add(d['organization']);
+            productCodeSet.add(d['product_code']);
+            productTypeSet.add(d['product_type']);
+            regionSet.add(d['region']);
+            countySet.add(d['county']);
+        }
+
+        this.setState({
+            organization: [...organizationSet],
+            product_code: [...productCodeSet],
+            product_type: [...productTypeSet],
+            region: [...regionSet],
+            county: [...countySet]
+        });
+    };
+
+    categoryClickHandler = category => {
+        this.setState({ selectedCategory: category });
+    };
+
+    categoryItemSelectionChangeHandler = (category, categoryVal, isSelected) => {
+        // Only add unique filters
+        const found = this.state.selectedFilter.find(
+            sf => sf.category === category && sf.categoryVal === categoryVal
+        );
+        if (found) {
+            return;
+        }
+
+        if (isSelected) {
+            this.state.selectedFilter.push({
+                category,
+                categoryVal
+            });
+        } else {
+            const foundIndex = this.state.selectedFilter.findIndex(
+                f => f.category === category && f.categoryVal === categoryVal
+            );
+            this.state.selectedFilter.splice(foundIndex, 1);
+        }
+
+        let tmpData = JSON.parse(JSON.stringify(this.state.data));
+
+        if (this.state.selectedFilter.length > 0) {
+            this.state.selectedFilter.forEach(sf => {
+                tmpData = tmpData.filter(d => d[sf.category] === sf.categoryVal);
+            });
+        }
+
+        this.setState({ filteredData: tmpData }, () => {
+            this.generateUniqueCategory();
+        });
+    };
+
     handleDrawer = () => {
-        this.setState({globalFilterOpen: !this.state.globalFilterOpen});
+        this.setState({ globalFilterOpen: !this.state.globalFilterOpen });
     };
 
     render() {
-        const { globalFilterOpen }= this.state;
-        const {classes} = this.props;
+        const { globalFilterOpen } = this.state;
+        const { classes } = this.props;
         return (
             <Fragment>
                 <div className={classes.Filtericon} onClick={() => this.handleDrawer()}>
                     Filters&nbsp;
-                    <FontAwesomeIcon icon={faTimes} style={{margin:3}} aria-hidden='true'/>
+                    <FontAwesomeIcon icon={faTimes} style={{ margin: 3 }} aria-hidden="true" />
                 </div>
-                <Drawer className={classes.FilterDrawer} anchor='right' open={globalFilterOpen}
+
+                <Drawer
+                    className={classes.FilterDrawer}
+                    anchor="right"
+                    open={globalFilterOpen}
                     PaperProps={{
                         style: {
                             width: drawerWidth,
-                            padding: "15px",
-                            overflow: "auto"
+                            padding: '15px',
+                            overflow: 'auto'
                         }
                     }}
                 >
                     <div className={classes.FilterHeader}>
-                        <FontAwesomeIcon className={classes.FilterCloseIcon} icon={faTimes} aria-hidden='true' onClick={() => this.handleDrawer()}/>  
+                        <FontAwesomeIcon
+                            className={classes.FilterCloseIcon}
+                            icon={faTimes}
+                            aria-hidden="true"
+                            onClick={() => this.handleDrawer()}
+                        />
                     </div>
+
                     <div className={classes.FilterBody}>
-                        {this.props.enableMemberSearch ? (<div> member search</div>) : ''}
-                        {this.props.enableDateSearch ? (<div> Date search</div>) : ''}
-                        {this.props.enableMonthRangeSearch ? (<div> Month range search</div>) : ''}
-                        <CategorySearch/>
+                        {this.props.enableMemberSearch ? <div> member search</div> : ''}
+                        {this.props.enableDateSearch ? <div> Date search</div> : ''}
+                        {this.props.enableMonthRangeSearch ? <div> Month range search</div> : ''}
+
+                        <div className={classes.globalFilterContainer}>
+                            <div className={classes.topContainer}>
+                                <div className={classes.leftContainer}>
+                                    {this.state.categories.map(category => (
+                                        <div
+                                            key={category}
+                                            className={
+                                                classes.leftContainerItem +
+                                                ' ' +
+                                                (this.state.selectedCategory === category
+                                                    ? classes.selectedCategory
+                                                    : '')
+                                            }
+                                            onClick={this.categoryClickHandler.bind(this, category)}
+                                        >
+                                            {category}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className={classes.rightContainer}>
+                                    {this.state[this.state.selectedCategory].map(categoryItem => {
+                                        return (
+                                            <div
+                                                key={categoryItem}
+                                                className={classes.rightContainerItem}
+                                                onClick={this.categoryItemSelectionChangeHandler.bind(
+                                                    this,
+                                                    this.state.selectedCategory,
+                                                    categoryItem,
+                                                    true
+                                                )}
+                                            >
+                                                {categoryItem}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div className={classes.bottomContainer}>
+                                {this.state.selectedFilter.map(sf => {
+                                    return (
+                                        <div
+                                            className={classes.selectedFilterChip}
+                                            key={sf.categoryVal + sf.category}
+                                        >
+                                            {sf.categoryVal}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </Drawer>
             </Fragment>
@@ -86,6 +328,6 @@ class GlobalFilter extends Component {
     }
 }
 
-const GlobalFilterWrapped = withStyles(styles, {withTheme: true})(GlobalFilter);
+const GlobalFilterWrapped = withStyles(styles, { withTheme: true })(GlobalFilter);
 
 export default GlobalFilterWrapped;
