@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-import { List, ListItemText, Chip, Button } from "@material-ui/core";
+import { List, ListItemText, Chip, Button, ListItem } from "@material-ui/core";
 import {
   fontAwesomeIcon,
   FontAwesomeIcon
@@ -17,7 +17,7 @@ const theme = createMuiTheme({
 const styles = theme => ({
   SearchContainer: {
     border: "1px solid #a8a9a9",
-    borderTop: "5px solid #00o9fae",
+    borderTop: "5px solid #009fae",
     borderRadius: "5px",
     marginBottom: "15px",
     boxShadow: "0px 3px 4px 0px #c0c0c0",
@@ -55,13 +55,34 @@ const styles = theme => ({
     border: "1px solid #ccc",
     borderRadius: "5px",
     marginTop: "5px"
+  },
+  CategoryListItem: {
+    "& ::after": {
+      content: "",
+      position: "absolute",
+      right: "0%",
+      top: "25%",
+      width: "0",
+      height: "0",
+      borderRight: "12px solid #FFF",
+      borderBottom: "12px solid transparent",
+      borderTop: "12px solid transparent",
+      clear: "both"
+    }
   }
 });
 
 class CategorySearch extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      categoryItems: [
+        { label: "Organization", value: "OrganizationName" },
+        { label: "Product Type", value: "Product" },
+        { label: "Plan Type", value: "PlanCode" },
+        { label: "County", value: "County" }
+      ]
+    };
   }
   render() {
     const { classes } = this.props;
@@ -69,7 +90,30 @@ class CategorySearch extends Component {
       <div className={classes.SearchContainer}>
         <div className={classes.CategoryContainer}>
           <div className={classes.CategoryListContainer}>
-            category list container
+            <List>
+              {this.state.categoryItems.map(item => {
+                return (
+                  <ListItem
+                    key={item.label}
+                    className={classes.CategoryListItem}
+                    button
+                    onClick={() => console.log("list item selected")}
+                  >
+                    <ListItemText
+                      styles={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        margin: "0"
+                      }}
+                      disableTypography
+                    >
+                      {item.label}
+                    </ListItemText>
+                  </ListItem>
+                );
+              })}
+            </List>
           </div>
           <div className={classes.CategoryFilteredListContainer}>
             category filtered list container
