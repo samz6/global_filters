@@ -452,6 +452,24 @@ class GlobalFilter extends Component {
 
             this.setState({ organization, county, region, product_type, plan_type });
         }
+
+        if (this.state.selectedFilter.length === 0) {
+            let organization = this.state.organization;
+            organization.forEach(i => (i.isDisabled = false));
+
+            let county = this.state.county;
+            county.forEach(i => (i.isDisabled = false));
+
+            let region = this.state.region;
+            region.forEach(i => (i.isDisabled = false));
+
+            let product_type = this.state.product_type;
+            product_type.forEach(i => (i.isDisabled = false));
+
+            let plan_type = this.state.plan_type;
+            plan_type.forEach(i => (i.isDisabled = false));
+            this.setState({ organization, county, region, product_type, plan_type });
+        }
     };
 
     handleDrawer = () => {
