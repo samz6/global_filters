@@ -405,48 +405,60 @@ class GlobalFilter extends Component {
 
             const organization = this.state.organization;
             let isRootFilter = rootFilter === 'organization';
-            for (let o of organization) {
-                if (isRootFilter || availableOrganization.hasOwnProperty(o.value)) {
-                    o.isDisabled = false;
-                } else {
-                    o.isDisabled = true;
+            if (category !== 'organization') {
+                for (let o of organization) {
+                    if (isRootFilter || availableOrganization.hasOwnProperty(o.value)) {
+                        o.isDisabled = false;
+                    } else {
+                        o.isDisabled = true;
+                    }
                 }
             }
 
             const county = this.state.county;
             isRootFilter = rootFilter === 'county';
-            for (let c of county) {
-                if (isRootFilter || availableCounty.hasOwnProperty(c.value)) {
-                    c.isDisabled = false;
-                } else {
-                    c.isDisabled = true;
+            if (category !== 'county') {
+                for (let c of county) {
+                    if (isRootFilter || availableCounty.hasOwnProperty(c.value)) {
+                        c.isDisabled = false;
+                    } else {
+                        c.isDisabled = true;
+                    }
                 }
             }
 
             const region = this.state.region;
-            for (let r of region) {
-                if (isRootFilter || availableRegion.hasOwnProperty(r.value)) {
-                    r.isDisabled = false;
-                } else {
-                    r.isDisabled = true;
+            isRootFilter = rootFilter === 'region';
+            if (category !== 'region') {
+                for (let r of region) {
+                    if (isRootFilter || availableRegion.hasOwnProperty(r.value)) {
+                        r.isDisabled = false;
+                    } else {
+                        r.isDisabled = true;
+                    }
                 }
             }
-
             const product_type = this.state.product_type;
-            for (let prodT of product_type) {
-                if (isRootFilter || availableProductType.hasOwnProperty(prodT.value)) {
-                    prodT.isDisabled = false;
-                } else {
-                    prodT.isDisabled = true;
+            isRootFilter = rootFilter === 'product_type';
+            if (category !== 'product_type') {
+                for (let prodT of product_type) {
+                    if (isRootFilter || availableProductType.hasOwnProperty(prodT.value)) {
+                        prodT.isDisabled = false;
+                    } else {
+                        prodT.isDisabled = true;
+                    }
                 }
             }
 
             const plan_type = this.state.plan_type;
-            for (let planT of product_type) {
-                if (isRootFilter || availablePlanType.hasOwnProperty(planT.value)) {
-                    planT.isDisabled = false;
-                } else {
-                    planT.isDisabled = true;
+            isRootFilter = rootFilter === 'plan_type';
+            if (category !== 'plan_type') {
+                for (let planT of plan_type) {
+                    if (isRootFilter || availablePlanType.hasOwnProperty(planT.value)) {
+                        planT.isDisabled = false;
+                    } else {
+                        planT.isDisabled = true;
+                    }
                 }
             }
 
