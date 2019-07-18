@@ -1,0 +1,130 @@
+[
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Orange County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Sarasota County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Lee County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Lake County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Citrus County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Charlotte County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Charlotte County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Sarasota County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Polk County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Duval County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "SNP",
+        plan_type: "HMO(SNP)",
+        county: "Orange County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "SNP",
+        plan_type: "HMO(SNP)",
+        county: "Sarasota County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "SNP",
+        plan_type: "HMO(SNP)",
+        county: "Duval County",
+        region: "region-1"
+    },
+    {
+        organization: "Aetna Medicare",
+        product_type: "SNP",
+        plan_type: "HMO(SNP)",
+        county: "Polk County",
+        region: "region-1"
+    },
+    {
+        organization: "Allwell",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Polk County",
+        region: "region-1"
+    },
+    {
+        organization: "Allwell",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Orange County",
+        region: "region-1"
+    },
+    {
+        organization: "Allwell",
+        product_type: "MAPD",
+        plan_type: "HMO",
+        county: "Duwal County",
+        region: "region-1"
+    },
+    {
+        organization: "Allwell",
+        product_type: "SNP",
+        plan_type: "HMO(SNP)",
+        county: "Polk County",
+        region: "region-1"
+    },
+    
+
+]
