@@ -444,6 +444,18 @@ class GlobalFilter extends Component {
       }
     });
 
+    /*
+    SELECT * from data WHERE organization in (categoryItem1, categoryItem2, ...);
+    SELECT * from data WHERE county in (categoryItem1, categoryItem2, ...);
+    SELECT * from data WHERE product_type in (categoryItem1, categoryItem2, ...);
+    SELECT * from data WHERE plan_type in (categoryItem1, categoryItem2, ...);
+    */
+
+    /*
+      SELECT * from data WHERE organization in (categoryItem1, categoryItem2, ...) OR county in (categoryItem1, categoryItem2, ...)
+    */
+
+    
     if (this.state.selectedFilter.length > 0) {
       groupedSelectedFilter.forEach((gsf, i) => {
         tmpFilteredData = tmpFilteredData.filter(d =>
@@ -451,6 +463,28 @@ class GlobalFilter extends Component {
         );
       });
     }
+
+    /* 
+    const fc = {};
+    groupedSelectedFilter.forEach(gsf => {
+      fc[gsf.category] = gsf.categoryValues;
+    });
+    */
+
+
+    // if (this.state.selectedFilter.length > 0) {
+    //   tmpFilteredData = tmpFilteredData.filter(d => {
+    //     let retVal = true;
+    //     for (const gsf of groupedSelectedFilter) {
+    //       if (gsf.categoryValues.hasOwnProperty(d[gsf.category]) === false) {
+    //         retVal = false;
+    //         break;
+    //       }
+    //     }
+
+    //     return retVal;
+    //   });
+    // }
 
     // if (this.state.selectedFilter.length > 0) {
     //   this.state.selectedFilter.forEach((gsf, i) => {
@@ -474,67 +508,119 @@ class GlobalFilter extends Component {
       availableCounty[d["county"]] = true;
     }
 
+    let unSelectedFilters = [];
     if (this.state.selectedFilter.length > 0) {
       const rootFilter = this.state.selectedFilter[0].category;
 
       const organization = this.state.organization;
       let isRootFilter = rootFilter === "organization";
-      if (category !== "organization") {
-        for (let o of organization) {
-          if (isRootFilter || availableOrganization.hasOwnProperty(o.value)) {
+      for (let o of organization) {
+        if (category !== "organization") {
+          if (isRootFilter) {
             o.isDisabled = false;
+            if (availableOrganization.hasOwnProperty(o.value)) {
+              // o.isSelected = true;
+            } else if (o.isSelected) {
+              unSelectedFilters.push(`organization###${o.value}`);
+              o.isSelected = false;
+            }
           } else {
-            o.isDisabled = true;
+            if (availableOrganization.hasOwnProperty(o.value)) {
+              o.isDisabled = false;
+            } else {
+              o.isDisabled = true;
+              o.isSelected = false;
+            }
           }
         }
       }
 
       const county = this.state.county;
       isRootFilter = rootFilter === "county";
-      if (category !== "county") {
-        for (let c of county) {
-          if (isRootFilter || availableCounty.hasOwnProperty(c.value)) {
+      for (let c of county) {
+        if (category !== "county") {
+          if (isRootFilter) {
             c.isDisabled = false;
+            if (availableCounty.hasOwnProperty(c.value)) {
+              // c.isSelected = true;
+            } else if (c.isSelected) {
+              unSelectedFilters.push(`county###${c.value}`);
+              c.isSelected = false;
+            }
           } else {
-            c.isDisabled = true;
+            if (availableCounty.hasOwnProperty(c.value)) {
+              c.isDisabled = false;
+            } else {
+              c.isDisabled = true;
+              c.isSelected = false;
+            }
           }
         }
       }
 
       const region = this.state.region;
       isRootFilter = rootFilter === "region";
-      if (category !== "region") {
-        for (let r of region) {
-          if (isRootFilter || availableRegion.hasOwnProperty(r.value)) {
+      for (let r of region) {
+        if (category !== "region") {
+          if (isRootFilter) {
             r.isDisabled = false;
+            if (availableRegion.hasOwnProperty(r.value)) {
+              // r.isSelected = true;
+            } else if (r.isSelected) {
+              unSelectedFilters.push(`region###${r.value}`);
+              r.isSelected = false;
+            }
           } else {
-            r.isDisabled = true;
+            if (availableRegion.hasOwnProperty(r.value)) {
+              r.isDisabled = false;
+            } else {
+              r.isDisabled = true;
+              r.isSelected = false;
+            }
           }
         }
       }
+
       const product_type = this.state.product_type;
       isRootFilter = rootFilter === "product_type";
-      if (category !== "product_type") {
-        for (let prodT of product_type) {
-          if (
-            isRootFilter ||
-            availableProductType.hasOwnProperty(prodT.value)
-          ) {
+      for (let prodT of product_type) {
+        if (category !== "product_type") {
+          if (isRootFilter) {
             prodT.isDisabled = false;
+            if (availableProductType.hasOwnProperty(prodT.value)) {
+              prodT.isSelected = true;
+            } else {
+              prodT.isSelected = false;
+            }
           } else {
-            prodT.isDisabled = true;
+            if (availableProductType.hasOwnProperty(prodT.value)) {
+              prodT.isDisabled = false;
+            } else {
+              prodT.isDisabled = true;
+              prodT.isSelected = false;
+            }
           }
         }
       }
 
       const plan_type = this.state.plan_type;
       isRootFilter = rootFilter === "plan_type";
-      if (category !== "plan_type") {
-        for (let planT of plan_type) {
-          if (isRootFilter || availablePlanType.hasOwnProperty(planT.value)) {
+      for (let planT of plan_type) {
+        if (category !== "product_type") {
+          if (isRootFilter) {
             planT.isDisabled = false;
+            if (availablePlanType.hasOwnProperty(planT.value)) {
+              planT.isSelected = true;
+            } else {
+              planT.isSelected = false;
+            }
           } else {
-            planT.isDisabled = true;
+            if (availablePlanType.hasOwnProperty(planT.value)) {
+              planT.isDisabled = false;
+            } else {
+              planT.isDisabled = true;
+              planT.isSelected = false;
+            }
           }
         }
       }
@@ -559,6 +645,20 @@ class GlobalFilter extends Component {
       plan_type.forEach(i => (i.isDisabled = false));
       this.setState({ organization, county, region, product_type, plan_type });
     }
+
+    const selectedFilterProcessed = this.state.selectedFilter;
+    unSelectedFilters.forEach(usf => {
+      const ci = usf.split("###");
+      const foundIndex = selectedFilterProcessed.findIndex(
+        sf => sf.category === ci[0] && sf.categoryVal
+      );
+      if (foundIndex !== -1) {
+        selectedFilterProcessed.splice(foundIndex, 1);
+      }
+    });
+    this.setState({
+      selectedFilter: selectedFilterProcessed
+    });
   };
 
   handleDrawer = () => {
