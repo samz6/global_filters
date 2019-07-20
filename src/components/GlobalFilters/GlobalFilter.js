@@ -496,7 +496,6 @@ class GlobalFilter extends Component {
 
     let unSelectedFiltersObj = {};
     if (this.state.selectedFilter.length > 0) {
-
       const organization = this.state.organization;
       if (category !== "organization") {
         for (let o of organization) {
@@ -568,21 +567,16 @@ class GlobalFilter extends Component {
     }
 
     if (this.state.selectedFilter.length === 0) {
-      let organization = this.state.organization;
-      organization.forEach(i => (i.isDisabled = false));
+      const uniqueCategoriesItems = {};
+      this.state.categories.forEach(categoryField => {
+        uniqueCategoriesItems[categoryField] = this.state[categoryField];
+        uniqueCategoriesItems[categoryField].forEach(curCatoryItem => {
+          curCatoryItem.isDisabled = false;
+        });
+      });
 
-      let county = this.state.county;
-      county.forEach(i => (i.isDisabled = false));
-
-      let region = this.state.region;
-      region.forEach(i => (i.isDisabled = false));
-
-      let product_type = this.state.product_type;
-      product_type.forEach(i => (i.isDisabled = false));
-
-      let plan_type = this.state.plan_type;
-      plan_type.forEach(i => (i.isDisabled = false));
-      this.setState({ organization, county, region, product_type, plan_type });
+      this.setState(uniqueCategoriesItems);
+      this.setState({uniqueCategoriesItems});
     }
   };
 
