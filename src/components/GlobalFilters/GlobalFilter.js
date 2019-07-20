@@ -469,27 +469,6 @@ class GlobalFilter extends Component {
       }
     });
 
-    /*
-    SELECT * from data WHERE organization in (categoryItem1, categoryItem2, ...);
-    SELECT * from data WHERE county in (categoryItem1, categoryItem2, ...);
-    SELECT * from data WHERE product_type in (categoryItem1, categoryItem2, ...);
-    SELECT * from data WHERE plan_type in (categoryItem1, categoryItem2, ...);
-    */
-
-    /*
-      SELECT * from data WHERE organization in (categoryItem1, categoryItem2, ...) OR county in (categoryItem1, categoryItem2, ...)
-    */
-
-    /*
-    if (this.state.selectedFilter.length > 0) {
-      groupedSelectedFilter.forEach((gsf, i) => {
-        tmpFilteredData = tmpFilteredData.filter(d =>
-          gsf.categoryValues.hasOwnProperty(d[gsf.category])
-        );
-      });
-    }
-*/
-
     const q = {};
     groupedSelectedFilter.forEach(gsf => {
       q[gsf.category] = Object.keys(gsf.categoryValues);
@@ -500,35 +479,6 @@ class GlobalFilter extends Component {
     const ff = f.get();
     console.table(ff);
     tmpFilteredData = ff;
-
-    /* 
-    const fc = {};
-    groupedSelectedFilter.forEach(gsf => {
-      fc[gsf.category] = gsf.categoryValues;
-    });
-    */
-
-    // if (this.state.selectedFilter.length > 0) {
-    //   tmpFilteredData = tmpFilteredData.filter(d => {
-    //     let retVal = true;
-    //     for (const gsf of groupedSelectedFilter) {
-    //       if (gsf.categoryValues.hasOwnProperty(d[gsf.category]) === false) {
-    //         retVal = false;
-    //         break;
-    //       }
-    //     }
-
-    //     return retVal;
-    //   });
-    // }
-
-    // if (this.state.selectedFilter.length > 0) {
-    //   this.state.selectedFilter.forEach((gsf, i) => {
-    //     tmpFilteredData = tmpFilteredData.filter(
-    //       d => gsf.categoryVal === d[gsf.category]
-    //     );
-    //   });
-    // }
 
     let availableOrganization = {};
     let availablePlanType = {};
@@ -646,20 +596,6 @@ class GlobalFilter extends Component {
       plan_type.forEach(i => (i.isDisabled = false));
       this.setState({ organization, county, region, product_type, plan_type });
     }
-
-    // const selectedFilterProcessed = this.state.selectedFilter;
-    // unSelectedFilters.forEach(usf => {
-    //   const ci = usf.split("###");
-    //   const foundIndex = selectedFilterProcessed.findIndex(
-    //     sf => sf.category === ci[0] && sf.categoryVal === ci[1]
-    //   );
-    //   if (foundIndex !== -1) {
-    //     selectedFilterProcessed.splice(foundIndex, 1);
-    //   }
-    // });
-    // this.setState({
-    //   selectedFilter: selectedFilterProcessed
-    // });
   };
 
   handleDrawer = () => {
