@@ -3,6 +3,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createMuiTheme, Drawer } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import React, { Component, Fragment } from "react";
+const taffy = require("./taffy");
+
+console.log({ taffy });
 
 const theme = createMuiTheme({
   typography: {
@@ -455,7 +458,7 @@ class GlobalFilter extends Component {
       SELECT * from data WHERE organization in (categoryItem1, categoryItem2, ...) OR county in (categoryItem1, categoryItem2, ...)
     */
 
-    
+    /*
     if (this.state.selectedFilter.length > 0) {
       groupedSelectedFilter.forEach((gsf, i) => {
         tmpFilteredData = tmpFilteredData.filter(d =>
@@ -463,6 +466,18 @@ class GlobalFilter extends Component {
         );
       });
     }
+*/
+
+    const q = {};
+    groupedSelectedFilter.forEach(gsf => {
+      q[gsf.category] = Object.keys(gsf.categoryValues);
+    });
+
+    const db = taffy.taffy(tmpFilteredData);
+    const f = db(q);
+    const ff = f.get();
+    console.log({ ff });
+    tmpFilteredData = ff;
 
     /* 
     const fc = {};
@@ -470,7 +485,6 @@ class GlobalFilter extends Component {
       fc[gsf.category] = gsf.categoryValues;
     });
     */
-
 
     // if (this.state.selectedFilter.length > 0) {
     //   tmpFilteredData = tmpFilteredData.filter(d => {
@@ -513,114 +527,66 @@ class GlobalFilter extends Component {
       const rootFilter = this.state.selectedFilter[0].category;
 
       const organization = this.state.organization;
-      let isRootFilter = rootFilter === "organization";
-      for (let o of organization) {
-        if (category !== "organization") {
-          if (isRootFilter) {
+      if (category !== "organization") {
+        for (let o of organization) {
+          if (availableOrganization.hasOwnProperty(o.value)) {
             o.isDisabled = false;
-            if (availableOrganization.hasOwnProperty(o.value)) {
-              // o.isSelected = true;
-            } else if (o.isSelected) {
-              unSelectedFilters.push(`organization###${o.value}`);
-              o.isSelected = false;
-            }
           } else {
-            if (availableOrganization.hasOwnProperty(o.value)) {
-              o.isDisabled = false;
-            } else {
-              o.isDisabled = true;
-              o.isSelected = false;
-            }
+            o.isDisabled = true;
+            o.isSelected = false;
+            unSelectedFilters.push(`organization###${o.value}`);
           }
         }
       }
 
       const county = this.state.county;
-      isRootFilter = rootFilter === "county";
-      for (let c of county) {
-        if (category !== "county") {
-          if (isRootFilter) {
+      if (category !== "county") {
+        for (let c of county) {
+          if (availableCounty.hasOwnProperty(c.value)) {
             c.isDisabled = false;
-            if (availableCounty.hasOwnProperty(c.value)) {
-              // c.isSelected = true;
-            } else if (c.isSelected) {
-              unSelectedFilters.push(`county###${c.value}`);
-              c.isSelected = false;
-            }
           } else {
-            if (availableCounty.hasOwnProperty(c.value)) {
-              c.isDisabled = false;
-            } else {
-              c.isDisabled = true;
-              c.isSelected = false;
-            }
+            c.isDisabled = true;
+            c.isSelected = false;
+            unSelectedFilters.push(`county###${c.value}`);
           }
         }
       }
 
       const region = this.state.region;
-      isRootFilter = rootFilter === "region";
-      for (let r of region) {
-        if (category !== "region") {
-          if (isRootFilter) {
+      if (category !== "region") {
+        for (let r of region) {
+          if (availableRegion.hasOwnProperty(r.value)) {
             r.isDisabled = false;
-            if (availableRegion.hasOwnProperty(r.value)) {
-              // r.isSelected = true;
-            } else if (r.isSelected) {
-              unSelectedFilters.push(`region###${r.value}`);
-              r.isSelected = false;
-            }
           } else {
-            if (availableRegion.hasOwnProperty(r.value)) {
-              r.isDisabled = false;
-            } else {
-              r.isDisabled = true;
-              r.isSelected = false;
-            }
+            r.isDisabled = true;
+            r.isSelected = false;
+            unSelectedFilters.push(`region###${r.value}`);
           }
         }
       }
 
       const product_type = this.state.product_type;
-      isRootFilter = rootFilter === "product_type";
-      for (let prodT of product_type) {
-        if (category !== "product_type") {
-          if (isRootFilter) {
+      if (category !== "product_type") {
+        for (let prodT of product_type) {
+          if (availableProductType.hasOwnProperty(prodT.value)) {
             prodT.isDisabled = false;
-            if (availableProductType.hasOwnProperty(prodT.value)) {
-              prodT.isSelected = true;
-            } else {
-              prodT.isSelected = false;
-            }
           } else {
-            if (availableProductType.hasOwnProperty(prodT.value)) {
-              prodT.isDisabled = false;
-            } else {
-              prodT.isDisabled = true;
-              prodT.isSelected = false;
-            }
+            prodT.isDisabled = true;
+            prodT.isSelected = false;
+            unSelectedFilters.push(`product_type###${prodT.value}`);
           }
         }
       }
 
       const plan_type = this.state.plan_type;
-      isRootFilter = rootFilter === "plan_type";
-      for (let planT of plan_type) {
-        if (category !== "product_type") {
-          if (isRootFilter) {
+      if (category !== "plan_type") {
+        for (let planT of plan_type) {
+          if (availablePlanType.hasOwnProperty(planT.value)) {
             planT.isDisabled = false;
-            if (availablePlanType.hasOwnProperty(planT.value)) {
-              planT.isSelected = true;
-            } else {
-              planT.isSelected = false;
-            }
           } else {
-            if (availablePlanType.hasOwnProperty(planT.value)) {
-              planT.isDisabled = false;
-            } else {
-              planT.isDisabled = true;
-              planT.isSelected = false;
-            }
+            planT.isDisabled = true;
+            planT.isSelected = false;
+            unSelectedFilters.push(`plan_type###${planT.value}`);
           }
         }
       }
@@ -650,7 +616,7 @@ class GlobalFilter extends Component {
     unSelectedFilters.forEach(usf => {
       const ci = usf.split("###");
       const foundIndex = selectedFilterProcessed.findIndex(
-        sf => sf.category === ci[0] && sf.categoryVal
+        sf => sf.category === ci[0] && sf.categoryVal === ci[1]
       );
       if (foundIndex !== -1) {
         selectedFilterProcessed.splice(foundIndex, 1);
