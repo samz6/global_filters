@@ -354,24 +354,24 @@ class GlobalFilter extends Component {
   }
 
   componentDidMount() {
-    this.generateUniqueCategory();
+    this.generateDistinctCategories();
   }
 
-  generateUniqueCategory = () => {
-    const categoriesSet = {};
+  generateDistinctCategories = () => {
+    const distinctCategories = {};
 
     this.state.categories.forEach(categoryField => {
-      categoriesSet[categoryField] = new Set();
+      distinctCategories[categoryField] = new Set();
     });
 
     this.state.filteredData.forEach(item => {
       this.state.categories.forEach(categoryField => {
-        categoriesSet[categoryField].add(item[categoryField]);
+        distinctCategories[categoryField].add(item[categoryField]);
       });
     });
 
     this.state.categories.forEach(categoryField => {
-      categoriesSet[categoryField] = [...categoriesSet[categoryField]]
+      distinctCategories[categoryField] = [...distinctCategories[categoryField]]
         .sort((a, b) => a.localeCompare(b))
         .map(item => ({
           value: item,
@@ -380,7 +380,7 @@ class GlobalFilter extends Component {
         }));
     });
 
-    this.setState(categoriesSet);
+    this.setState(distinctCategories);
   };
 
   categoryClickHandler = category => {
