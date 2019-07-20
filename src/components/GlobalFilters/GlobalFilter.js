@@ -1,4 +1,8 @@
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faTimes,
+  faTimesCircle
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createMuiTheme, Drawer } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
@@ -101,12 +105,25 @@ const styles = theme => ({
     margin: "15px",
     padding: "10px"
   },
-  selectedFilterChip: {
+  selectedFilterChipContainer: {
     border: "1px solid red",
     borderRadius: "3px",
     padding: "5px",
     margin: "5px",
+    display: "inline-flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  selectedFilterChipLabel: {
+    padding: "5px",
+    margin: "5px",
     display: "inline-block"
+  },
+  selectedFilterChipIcon: {
+    padding: "5px",
+    color: "red",
+    cursor: "pointer"
   }
 });
 
@@ -331,6 +348,7 @@ class GlobalFilter extends Component {
         "plan_type"
       ],
       selectedCategory: "organization",
+      unSelectedFiltersObj: {},
       selectedFilter: []
     };
   }
@@ -397,12 +415,16 @@ class GlobalFilter extends Component {
     this.setState({ selectedCategory: category });
   };
 
-  categoryItemSelectionChangeHandler = (category, categoryItem) => {
-    const isSelected = !categoryItem.isSelected;
+  categoryItemSelectionChangeHandler = (
+    category,
+    categoryValue,
+    isItemSelected
+  ) => {
+    const isSelected = !isItemSelected;
     const tmpCategory = this.state[category];
-    // finding the categoryItem selected in the unique category set for checking or unchecking
+    // finding the categoryValue selected in the unique category set for checking or unchecking
     const foundCategory = tmpCategory.find(
-      item => item.value === categoryItem.value
+      item => item.value === categoryValue
     );
     foundCategory.isSelected = isSelected;
     this.setState({ [category]: tmpCategory });
@@ -417,7 +439,7 @@ class GlobalFilter extends Component {
       }
       const newFilterItem = {
         category,
-        categoryVal: categoryItem.value
+        categoryVal: categoryValue
       };
       if (lastFoundIndex === -1) {
         this.state.selectedFilter.push(newFilterItem);
@@ -426,7 +448,7 @@ class GlobalFilter extends Component {
       }
     } else {
       const foundIndex = this.state.selectedFilter.findIndex(
-        f => f.category === category && f.categoryVal === categoryItem.value
+        f => f.category === category && f.categoryVal === categoryValue
       );
       this.state.selectedFilter.splice(foundIndex, 1); //need to change as we directly changing the state
     }
@@ -476,7 +498,7 @@ class GlobalFilter extends Component {
     const db = taffy.taffy(tmpFilteredData);
     const f = db(q);
     const ff = f.get();
-    console.log({ ff });
+    console.table(ff);
     tmpFilteredData = ff;
 
     /* 
@@ -523,6 +545,7 @@ class GlobalFilter extends Component {
     }
 
     let unSelectedFilters = [];
+    let unSelectedFiltersObj = {};
     if (this.state.selectedFilter.length > 0) {
       const rootFilter = this.state.selectedFilter[0].category;
 
@@ -533,8 +556,9 @@ class GlobalFilter extends Component {
             o.isDisabled = false;
           } else {
             o.isDisabled = true;
-            o.isSelected = false;
+            // o.isSelected = false;
             unSelectedFilters.push(`organization###${o.value}`);
+            unSelectedFiltersObj[`organization###${o.value}`] = true;
           }
         }
       }
@@ -546,8 +570,9 @@ class GlobalFilter extends Component {
             c.isDisabled = false;
           } else {
             c.isDisabled = true;
-            c.isSelected = false;
+            // c.isSelected = false;
             unSelectedFilters.push(`county###${c.value}`);
+            unSelectedFiltersObj[`county###${c.value}`] = true;
           }
         }
       }
@@ -559,8 +584,9 @@ class GlobalFilter extends Component {
             r.isDisabled = false;
           } else {
             r.isDisabled = true;
-            r.isSelected = false;
+            // r.isSelected = false;
             unSelectedFilters.push(`region###${r.value}`);
+            unSelectedFiltersObj[`region###${r.value}`] = true;
           }
         }
       }
@@ -572,8 +598,9 @@ class GlobalFilter extends Component {
             prodT.isDisabled = false;
           } else {
             prodT.isDisabled = true;
-            prodT.isSelected = false;
+            // prodT.isSelected = false;
             unSelectedFilters.push(`product_type###${prodT.value}`);
+            unSelectedFiltersObj[`product_type###${prodT.value}`] = true;
           }
         }
       }
@@ -585,13 +612,21 @@ class GlobalFilter extends Component {
             planT.isDisabled = false;
           } else {
             planT.isDisabled = true;
-            planT.isSelected = false;
+            // planT.isSelected = false;
             unSelectedFilters.push(`plan_type###${planT.value}`);
+            unSelectedFiltersObj[`plan_type###${planT.value}`] = true;
           }
         }
       }
 
-      this.setState({ organization, county, region, product_type, plan_type });
+      this.setState({
+        organization,
+        county,
+        region,
+        product_type,
+        plan_type,
+        unSelectedFiltersObj
+      });
     }
 
     if (this.state.selectedFilter.length === 0) {
@@ -612,19 +647,19 @@ class GlobalFilter extends Component {
       this.setState({ organization, county, region, product_type, plan_type });
     }
 
-    const selectedFilterProcessed = this.state.selectedFilter;
-    unSelectedFilters.forEach(usf => {
-      const ci = usf.split("###");
-      const foundIndex = selectedFilterProcessed.findIndex(
-        sf => sf.category === ci[0] && sf.categoryVal === ci[1]
-      );
-      if (foundIndex !== -1) {
-        selectedFilterProcessed.splice(foundIndex, 1);
-      }
-    });
-    this.setState({
-      selectedFilter: selectedFilterProcessed
-    });
+    // const selectedFilterProcessed = this.state.selectedFilter;
+    // unSelectedFilters.forEach(usf => {
+    //   const ci = usf.split("###");
+    //   const foundIndex = selectedFilterProcessed.findIndex(
+    //     sf => sf.category === ci[0] && sf.categoryVal === ci[1]
+    //   );
+    //   if (foundIndex !== -1) {
+    //     selectedFilterProcessed.splice(foundIndex, 1);
+    //   }
+    // });
+    // this.setState({
+    //   selectedFilter: selectedFilterProcessed
+    // });
   };
 
   handleDrawer = () => {
@@ -709,7 +744,8 @@ class GlobalFilter extends Component {
                         onClick={this.categoryItemSelectionChangeHandler.bind(
                           this,
                           this.state.selectedCategory,
-                          categoryItem
+                          categoryItem.value,
+                          categoryItem.isSelected
                         )}
                       >
                         <span>{categoryItem.value}</span>
@@ -725,13 +761,30 @@ class GlobalFilter extends Component {
               </div>
               <div className={classes.bottomContainer}>
                 {this.state.selectedFilter.map(sf => {
-                  return (
+                  return !this.state.unSelectedFiltersObj[
+                    `${sf.category}###${sf.categoryVal}`
+                  ] ? (
                     <div
-                      className={classes.selectedFilterChip}
+                      className={classes.selectedFilterChipContainer}
                       key={sf.categoryVal + sf.category}
                     >
-                      {sf.categoryVal}
+                      <div className={classes.selectedFilterChipLabel}>
+                        {sf.categoryVal}
+                      </div>
+                      <FontAwesomeIcon
+                        className={classes.selectedFilterChipIcon}
+                        onClick={this.categoryItemSelectionChangeHandler.bind(
+                          this,
+                          sf.category,
+                          sf.categoryVal,
+                          true
+                        )}
+                        icon={faTimesCircle}
+                        aria-hidden="true"
+                      />
                     </div>
+                  ) : (
+                    ""
                   );
                 })}
               </div>
