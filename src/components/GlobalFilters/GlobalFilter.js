@@ -494,10 +494,8 @@ class GlobalFilter extends Component {
       availableCounty[d["county"]] = true;
     }
 
-    let unSelectedFilters = [];
     let unSelectedFiltersObj = {};
     if (this.state.selectedFilter.length > 0) {
-      const rootFilter = this.state.selectedFilter[0].category;
 
       const organization = this.state.organization;
       if (category !== "organization") {
@@ -506,8 +504,6 @@ class GlobalFilter extends Component {
             o.isDisabled = false;
           } else {
             o.isDisabled = true;
-            // o.isSelected = false;
-            unSelectedFilters.push(`organization###${o.value}`);
             unSelectedFiltersObj[`organization###${o.value}`] = true;
           }
         }
@@ -520,8 +516,6 @@ class GlobalFilter extends Component {
             c.isDisabled = false;
           } else {
             c.isDisabled = true;
-            // c.isSelected = false;
-            unSelectedFilters.push(`county###${c.value}`);
             unSelectedFiltersObj[`county###${c.value}`] = true;
           }
         }
@@ -534,8 +528,6 @@ class GlobalFilter extends Component {
             r.isDisabled = false;
           } else {
             r.isDisabled = true;
-            // r.isSelected = false;
-            unSelectedFilters.push(`region###${r.value}`);
             unSelectedFiltersObj[`region###${r.value}`] = true;
           }
         }
@@ -548,8 +540,6 @@ class GlobalFilter extends Component {
             prodT.isDisabled = false;
           } else {
             prodT.isDisabled = true;
-            // prodT.isSelected = false;
-            unSelectedFilters.push(`product_type###${prodT.value}`);
             unSelectedFiltersObj[`product_type###${prodT.value}`] = true;
           }
         }
@@ -562,8 +552,6 @@ class GlobalFilter extends Component {
             planT.isDisabled = false;
           } else {
             planT.isDisabled = true;
-            // planT.isSelected = false;
-            unSelectedFilters.push(`plan_type###${planT.value}`);
             unSelectedFiltersObj[`plan_type###${planT.value}`] = true;
           }
         }
