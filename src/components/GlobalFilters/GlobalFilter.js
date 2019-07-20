@@ -358,57 +358,29 @@ class GlobalFilter extends Component {
   }
 
   generateUniqueCategory = () => {
-    let organizationSet = new Set();
-    let planTypeSet = new Set();
-    let productTypeSet = new Set();
-    let regionSet = new Set();
-    let countySet = new Set();
+    const categoriesSet = {};
 
-    for (let d of this.state.filteredData) {
-      organizationSet.add(d["organization"]);
-      planTypeSet.add(d["plan_type"]);
-      productTypeSet.add(d["product_type"]);
-      regionSet.add(d["region"]);
-      countySet.add(d["county"]);
-    }
-
-    let organization = [...organizationSet].map(item => ({
-      value: item,
-      isSelected: false,
-      isDisabled: false
-    }));
-
-    let plan_type = [...planTypeSet].map(item => ({
-      value: item,
-      isSelected: false,
-      isDisabled: false
-    }));
-
-    let product_type = [...productTypeSet].map(item => ({
-      value: item,
-      isSelected: false,
-      isDisabled: false
-    }));
-
-    let region = [...regionSet].map(item => ({
-      value: item,
-      isSelected: false,
-      isDisabled: false
-    }));
-
-    let county = [...countySet].map(item => ({
-      value: item,
-      isSelected: false,
-      isDisabled: false
-    }));
-
-    this.setState({
-      organization,
-      plan_type,
-      product_type,
-      region,
-      county
+    this.state.categories.forEach(categoryField => {
+      categoriesSet[categoryField] = new Set();
     });
+
+    this.state.filteredData.forEach(item => {
+      this.state.categories.forEach(categoryField => {
+        categoriesSet[categoryField].add(item[categoryField]);
+      });
+    });
+
+    this.state.categories.forEach(categoryField => {
+      categoriesSet[categoryField] = [...categoriesSet[categoryField]]
+        .sort((a, b) => a.localeCompare(b))
+        .map(item => ({
+          value: item,
+          isSelected: false,
+          isDisabled: false
+        }));
+    });
+
+    this.setState(categoriesSet);
   };
 
   categoryClickHandler = category => {
@@ -576,7 +548,7 @@ class GlobalFilter extends Component {
       });
 
       this.setState(uniqueCategoriesItems);
-      this.setState({uniqueCategoriesItems});
+      this.setState({ uniqueCategoriesItems });
     }
   };
 
