@@ -548,7 +548,6 @@ class GlobalFilter extends Component {
       });
 
       this.setState(uniqueCategoriesItems);
-      this.setState({ uniqueCategoriesItems });
     }
   };
 
