@@ -9,8 +9,6 @@ import { withStyles } from "@material-ui/styles";
 import React, { Component, Fragment } from "react";
 const taffy = require("./taffy");
 
-console.log({ taffy });
-
 const theme = createMuiTheme({
   typography: {
     useNextVariants: true
@@ -380,8 +378,6 @@ class GlobalFilter extends Component {
         }));
     });
 
-    console.log({ distinctCategories });
-
     this.setState(distinctCategories);
   };
 
@@ -427,29 +423,21 @@ class GlobalFilter extends Component {
       this.state.selectedFilter.splice(foundIndex, 1); //need to change as we directly changing the state
     }
 
-    let tmpFilteredData = JSON.parse(JSON.stringify(this.state.data));
-    const groupedSelectedFilter = [];
+    const whereClause = {};
     this.state.selectedFilter.forEach(sf => {
-      const found = groupedSelectedFilter.find(
-        item => item.category === sf.category
-      );
-      if (found) {
-        found.categoryValues[sf.categoryVal] = 1;
+      if (whereClause.hasOwnProperty(sf.category) === true) {
+        whereClause[sf.category] = [
+          ...whereClause[sf.category],
+          sf.categoryVal
+        ];
       } else {
-        groupedSelectedFilter.push({
-          category: sf.category,
-          categoryValues: { [sf.categoryVal]: 1 }
-        });
+        whereClause[sf.category] = [sf.categoryVal];
       }
     });
 
-    const q = {};
-    groupedSelectedFilter.forEach(gsf => {
-      q[gsf.category] = Object.keys(gsf.categoryValues);
-    });
-
+    let tmpFilteredData = JSON.parse(JSON.stringify(this.state.data));
     tmpFilteredData = taffy
-      .taffy(tmpFilteredData)(q)
+      .taffy(tmpFilteredData)(whereClause)
       .get();
 
     const distinctAvailableCategories = {};
