@@ -7,6 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createMuiTheme, Drawer } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import React, { Component, Fragment } from "react";
+import Button from "@material-ui/core/Button";
+
 const taffy = require("./taffy");
 
 const theme = createMuiTheme({
@@ -96,6 +98,7 @@ const styles = theme => ({
   },
   categoryItemDisabled: {
     color: "rgba(0, 0, 0, 0.2)",
+    display: "none",
     backgroundColor: "rgba(256, 256, 256, 0.5)"
   },
   bottomContainer: {
@@ -345,6 +348,7 @@ class GlobalFilter extends Component {
         "product_type",
         "plan_type"
       ],
+      presets:[],
       selectedCategory: "organization",
       unSelectedFiltersObj: {},
       selectedFilter: []
@@ -412,7 +416,7 @@ class GlobalFilter extends Component {
         categoryVal: categoryValue
       };
       if (lastFoundIndex === -1) {
-        this.state.selectedFilter.push(newFilterItem);
+        this.state.selectedFilter.push(newFilterItem); // TODO
       } else {
         this.state.selectedFilter.splice(lastFoundIndex + 1, 0, newFilterItem);
       }
@@ -487,6 +491,20 @@ class GlobalFilter extends Component {
 
       this.setState(uniqueCategoriesItems);
     }
+  };
+
+  clearFilterClickHandler = () => {
+    const uniqueCategoriesItems = {};
+    this.state.categories.forEach(categoryField => {
+      uniqueCategoriesItems[categoryField] = this.state[categoryField].map(
+        ci => ({ ...ci, isSelected: false, isDisabled: false })
+      );
+    });
+    this.setState({
+      ...uniqueCategoriesItems,
+      selectedFilter: [],
+      unSelectedFiltersObj: {}
+    });
   };
 
   handleDrawer = () => {
@@ -615,6 +633,29 @@ class GlobalFilter extends Component {
                   );
                 })}
               </div>
+            </div>
+
+            <div style={{ justifyContent: "flex-end", display: "flex" }}>
+              <Button
+                variant="contained"
+                style={{
+                  backgroundColor: "grey",
+                  color: "white",
+                  marginRight: "16px"
+                }}
+                className={classes.button}
+                onClick={this.clearFilterClickHandler}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="contained"
+                style={{ backgroundColor: "#009fae", color: "white" }}
+                className={classes.button}
+                onClick={this.applyFilterClickHandler}
+              >
+                Apply
+              </Button>
             </div>
           </div>
         </Drawer>
