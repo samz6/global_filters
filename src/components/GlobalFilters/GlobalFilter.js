@@ -380,6 +380,8 @@ class GlobalFilter extends Component {
         }));
     });
 
+    console.log({ distinctCategories });
+
     this.setState(distinctCategories);
   };
 
@@ -446,96 +448,44 @@ class GlobalFilter extends Component {
       q[gsf.category] = Object.keys(gsf.categoryValues);
     });
 
-    const db = taffy.taffy(tmpFilteredData);
-    const f = db(q);
-    const ff = f.get();
-    console.table(ff);
-    tmpFilteredData = ff;
+    tmpFilteredData = taffy
+      .taffy(tmpFilteredData)(q)
+      .get();
 
-    let availableOrganization = {};
-    let availablePlanType = {};
-    let availableProductType = {};
-    let availableRegion = {};
-    let availableCounty = {};
+    const distinctAvailableCategories = {};
 
-    for (let d of tmpFilteredData) {
-      availableOrganization[d["organization"]] = true;
-      availablePlanType[d["plan_type"]] = true;
-      availableProductType[d["product_type"]] = true;
-      availableRegion[d["region"]] = true;
-      availableCounty[d["county"]] = true;
-    }
+    this.state.categories.forEach(categoryField => {
+      distinctAvailableCategories[categoryField] = {};
+    });
+
+    tmpFilteredData.forEach(item => {
+      this.state.categories.forEach(categoryField => {
+        distinctAvailableCategories[categoryField][item[categoryField]] = true;
+      });
+    });
 
     let unSelectedFiltersObj = {};
+    const updatedCategories = {};
     if (this.state.selectedFilter.length > 0) {
-      const organization = this.state.organization;
-      if (category !== "organization") {
-        for (let o of organization) {
-          if (availableOrganization.hasOwnProperty(o.value)) {
-            o.isDisabled = false;
-          } else {
-            o.isDisabled = true;
-            unSelectedFiltersObj[`organization###${o.value}`] = true;
+      this.state.categories.forEach(categoryField => {
+        updatedCategories[categoryField] = this.state[categoryField];
+        if (category !== categoryField) {
+          for (let ci of updatedCategories[categoryField]) {
+            if (
+              distinctAvailableCategories[categoryField].hasOwnProperty(
+                ci.value
+              )
+            ) {
+              ci.isDisabled = false;
+            } else {
+              ci.isDisabled = true;
+              unSelectedFiltersObj[`${categoryField}###${ci.value}`] = true;
+            }
           }
         }
-      }
-
-      const county = this.state.county;
-      if (category !== "county") {
-        for (let c of county) {
-          if (availableCounty.hasOwnProperty(c.value)) {
-            c.isDisabled = false;
-          } else {
-            c.isDisabled = true;
-            unSelectedFiltersObj[`county###${c.value}`] = true;
-          }
-        }
-      }
-
-      const region = this.state.region;
-      if (category !== "region") {
-        for (let r of region) {
-          if (availableRegion.hasOwnProperty(r.value)) {
-            r.isDisabled = false;
-          } else {
-            r.isDisabled = true;
-            unSelectedFiltersObj[`region###${r.value}`] = true;
-          }
-        }
-      }
-
-      const product_type = this.state.product_type;
-      if (category !== "product_type") {
-        for (let prodT of product_type) {
-          if (availableProductType.hasOwnProperty(prodT.value)) {
-            prodT.isDisabled = false;
-          } else {
-            prodT.isDisabled = true;
-            unSelectedFiltersObj[`product_type###${prodT.value}`] = true;
-          }
-        }
-      }
-
-      const plan_type = this.state.plan_type;
-      if (category !== "plan_type") {
-        for (let planT of plan_type) {
-          if (availablePlanType.hasOwnProperty(planT.value)) {
-            planT.isDisabled = false;
-          } else {
-            planT.isDisabled = true;
-            unSelectedFiltersObj[`plan_type###${planT.value}`] = true;
-          }
-        }
-      }
-
-      this.setState({
-        organization,
-        county,
-        region,
-        product_type,
-        plan_type,
-        unSelectedFiltersObj
       });
+
+      this.setState({ ...updatedCategories, unSelectedFiltersObj });
     }
 
     if (this.state.selectedFilter.length === 0) {
