@@ -13,6 +13,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import { withStyles } from '@material-ui/styles';
 import React, { Component, Fragment } from 'react';
+import FormDialog from './FormDialog';
 
 const taffy = require('./taffy');
 
@@ -371,7 +372,10 @@ class GlobalFilter extends Component {
       presets: [{ name: 'Preset One', id: '1' }, { name: 'Preset One', id: '2' }],
       selectedCategory: 'organization',
       unSelectedFiltersObj: {},
-      selectedFilter: []
+      selectedFilter: [],
+      currentPresetName: '',
+      curPresetId: '',
+      formDialogMode: false
     };
   }
 
@@ -504,20 +508,34 @@ class GlobalFilter extends Component {
     this.setState({ selectedCategory: 'presets' });
   };
 
-  presetEditClickHandler = preset => {};
+  presetEditClickHandler = preset => {
+    this.setState({
+      formDialogMode: 'openEdit',
+      currentPresetName: preset.name,
+      curPresetId: preset.id
+    });
+  };
+
+  updatePresettSaveBtnClickHandler = (updatedPresetName, id) => {
+    const presets = this.state.presets;
+    const preset = presets.find(item => item.id === id);
+    if (preset) {
+      preset.name = updatedPresetName;
+      this.setState({ presets });
+    }
+  };
 
   presetDeleteClickHandler = preset => {};
 
-  createNewPresetButtonClickHandler = () => {
+  createPresetSaveBtnClickHandler = presetName => {
     const presets = [
       ...this.state.presets,
       {
         id: new Date().getTime(),
-        name: new Date().getTime().toString(),
+        name: presetName,
         filters: this.state.selectedFilter
       }
     ];
-    console.log({ presets });
     this.setState({ presets });
   };
 
@@ -629,14 +647,21 @@ class GlobalFilter extends Component {
                           </ListItem>
                         );
                       })}
-                      <div button className={classes.presetListItemCreateNewPreset}>
-                        <Button
-                          color="primary"
-                          className={classes.presetListItemCreateNewPresetButton}
-                          onClick={this.createNewPresetButtonClickHandler}
-                        >
-                          Create New Preset
-                        </Button>
+                      <div className={classes.presetListItemCreateNewPreset}>
+                        <FormDialog
+                          id={this.state.curPresetId}
+                          mode={this.state.formDialogMode}
+                          presetName={this.state.currentPresetName}
+                          disableCreatePresetBtn={
+                            this.state.selectedFilter.length > 0 ? false : true
+                          }
+                          createPresetHandler={presetName =>
+                            this.createPresetSaveBtnClickHandler(presetName)
+                          }
+                          updatePresetHandler={(updatedPresetName, id) => {
+                            this.updatePresettSaveBtnClickHandler(updatedPresetName, id);
+                          }}
+                        />
                       </div>
                     </List>
                   ) : (
