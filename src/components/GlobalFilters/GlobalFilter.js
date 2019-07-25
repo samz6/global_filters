@@ -1,15 +1,20 @@
 import {
   faCheck,
+  faEdit,
   faTimes,
-  faTimesCircle
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { createMuiTheme, Drawer } from "@material-ui/core";
-import { withStyles } from "@material-ui/styles";
-import React, { Component, Fragment } from "react";
-import Button from "@material-ui/core/Button";
+  faTimesCircle,
+  faTrashAlt
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { createMuiTheme, Drawer } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import { withStyles } from '@material-ui/styles';
+import React, { Component, Fragment } from 'react';
 
-const taffy = require("./taffy");
+const taffy = require('./taffy');
 
 const theme = createMuiTheme({
   typography: {
@@ -19,112 +24,133 @@ const theme = createMuiTheme({
 const drawerWidth = 600;
 const styles = theme => ({
   FilterIcons: {
-    display: "flex",
-    JustifyContent: "flex-end",
-    cursor: "pointer",
-    margin: "25px",
-    float: "right"
+    display: 'flex',
+    JustifyContent: 'flex-end',
+    cursor: 'pointer',
+    margin: '25px',
+    float: 'right'
   },
   FilterDrawer: {
-    flexShrink: "0"
+    flexShrink: '0'
   },
   FilerHeader: {
-    display: "flex",
-    JustifyContent: "flex-end",
-    alignItems: "center",
-    marginBottom: "20px"
+    display: 'flex',
+    JustifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: '20px'
   },
   FilterCloseIcon: {
-    marginLeft: "10px",
-    fontSize: "20px",
-    cursor: "pointer",
-    float: "right"
+    marginLeft: '10px',
+    fontSize: '20px',
+    cursor: 'pointer',
+    float: 'right'
   },
   FilterBody: {
-    height: "100%",
-    overflow: "auto"
+    height: '100%',
+    overflow: 'auto'
   },
   globalFilterContainer: {
-    display: "flex",
-    flexDirection: "column",
-    border: "1px solid tomato",
-    padding: "5px",
-    margin: "50px"
+    display: 'flex',
+    flexDirection: 'column',
+    border: '1px solid tomato',
+    padding: '5px',
+    margin: '50px'
   },
   topContainer: {
-    display: "flex",
-    flexDirection: "row",
-    margin: "15px",
-    padding: "10px",
-    border: "1px solid lightgreen"
+    display: 'flex',
+    flexDirection: 'row',
+    margin: '15px',
+    padding: '10px',
+    border: '1px solid lightgreen'
   },
   leftContainer: {
-    width: "30%",
-    display: "flex",
-    flexDirection: "column",
-    border: "1px solid #ccc"
+    width: '30%',
+    display: 'flex',
+    flexDirection: 'column',
+    border: '1px solid #ccc'
   },
   leftContainerItem: {
-    minHeight: "40px",
-    lineHeight: "40px",
-    border: "1px solid #ccc",
-    padding: "0 10px",
-    cursor: "pointer",
-    "&:hover": {
-      color: "red"
+    minHeight: '40px',
+    lineHeight: '40px',
+    border: '1px solid #ccc',
+    padding: '0 10px',
+    cursor: 'pointer',
+    '&:hover': {
+      color: 'red'
     }
   },
   selectedCategory: {
-    backgroundColor: "#ccc",
-    color: "red"
+    backgroundColor: '#ccc',
+    color: 'red'
   },
   rightContainer: {
-    width: "70%",
-    margin: "0 5px",
-    display: "flex",
-    flexDirection: "column",
-    border: "1px solid #ccc"
+    width: '70%',
+    margin: '0 5px',
+    display: 'flex',
+    flexDirection: 'column',
+    border: '1px solid #ccc'
   },
   rightContainerItem: {
-    minHeight: "40px",
-    lineHeight: "40px",
-    border: "1px solid #ccc",
-    padding: "0 15px",
-    cursor: "pointer",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+    minHeight: '40px',
+    lineHeight: '40px',
+    border: '1px solid #ccc',
+    padding: '0 15px',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   categoryItemDisabled: {
-    color: "rgba(0, 0, 0, 0.2)",
-    display: "none",
-    backgroundColor: "rgba(256, 256, 256, 0.5)"
+    color: 'rgba(0, 0, 0, 0.2)',
+    display: 'none',
+    backgroundColor: 'rgba(256, 256, 256, 0.5)'
   },
+  presetListItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '16px'
+  },
+  presetListItemIConContainer: {},
+  presetDeleteIcon: {
+    cursor: 'pointer'
+  },
+  presetEditIcon: {
+    marginRight: '16px',
+    cursor: 'pointer'
+  },
+  presetListItemCreateNewPreset: {
+    padding: '1px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '16px'
+  },
+  presetListItemCreateNewPresetButton: {},
   bottomContainer: {
-    border: "1px solid dodgerblue",
-    margin: "15px",
-    padding: "10px"
+    border: '1px solid dodgerblue',
+    margin: '15px',
+    padding: '10px'
   },
   selectedFilterChipContainer: {
-    border: "1px solid red",
-    borderRadius: "3px",
-    padding: "5px",
-    margin: "5px",
-    display: "inline-flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    border: '1px solid red',
+    borderRadius: '3px',
+    padding: '5px',
+    margin: '5px',
+    display: 'inline-flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   selectedFilterChipLabel: {
-    padding: "5px",
-    margin: "5px",
-    display: "inline-block"
+    padding: '5px',
+    margin: '5px',
+    display: 'inline-block'
   },
   selectedFilterChipIcon: {
-    padding: "5px",
-    color: "red",
-    cursor: "pointer"
+    padding: '5px',
+    color: 'red',
+    cursor: 'pointer'
   }
 });
 
@@ -134,200 +160,200 @@ class GlobalFilter extends Component {
 
     this.testData = [
       {
-        organization: "UnitedHealthcare",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Dewan County",
-        region: "region-1"
+        organization: 'UnitedHealthcare',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Dewan County',
+        region: 'region-1'
       },
       {
-        organization: "UnitedHealthcare",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Alachua County",
-        region: "region-1"
+        organization: 'UnitedHealthcare',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Alachua County',
+        region: 'region-1'
       },
       {
-        organization: "UnitedHealthcare",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Charlotte County",
-        region: "region-1"
+        organization: 'UnitedHealthcare',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Charlotte County',
+        region: 'region-1'
       },
       {
-        organization: "UnitedHealthcare",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Citrus County",
-        region: "region-2"
+        organization: 'UnitedHealthcare',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Citrus County',
+        region: 'region-2'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Orange County",
-        region: "region-1"
+        organization: 'Aetna Medicare',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Orange County',
+        region: 'region-1'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Sarasota County",
-        region: "region-1"
+        organization: 'Aetna Medicare',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Sarasota County',
+        region: 'region-1'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Osceola County",
-        region: "region-1"
+        organization: 'Aetna Medicare',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Osceola County',
+        region: 'region-1'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Lee County",
-        region: "region-2"
+        organization: 'Aetna Medicare',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Lee County',
+        region: 'region-2'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Lake County",
-        region: "region-2"
+        organization: 'Aetna Medicare',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Lake County',
+        region: 'region-2'
       },
       {
-        organization: "Allwell",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Osceola County",
-        region: "region-1"
+        organization: 'Allwell',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Osceola County',
+        region: 'region-1'
       },
       {
-        organization: "Allwell",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Orange County",
-        region: "region-1"
+        organization: 'Allwell',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Orange County',
+        region: 'region-1'
       },
       {
-        organization: "Allwell",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Boward County",
-        region: "region-2"
+        organization: 'Allwell',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Boward County',
+        region: 'region-2'
       },
       {
-        organization: "Allwell",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Duval County",
-        region: "region-1"
+        organization: 'Allwell',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Duval County',
+        region: 'region-1'
       },
       {
-        organization: "Allwell",
-        product_type: "SNP",
-        plan_type: "HMO (SNP)",
-        county: "Duval County",
-        region: "region-1"
+        organization: 'Allwell',
+        product_type: 'SNP',
+        plan_type: 'HMO (SNP)',
+        county: 'Duval County',
+        region: 'region-1'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Duval County",
-        region: "region-1"
+        organization: 'Aetna Medicare',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Duval County',
+        region: 'region-1'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "SNP",
-        plan_type: "HMO (SNP)",
-        county: "Duval County",
-        region: "region-1"
+        organization: 'Aetna Medicare',
+        product_type: 'SNP',
+        plan_type: 'HMO (SNP)',
+        county: 'Duval County',
+        region: 'region-1'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "MAPD",
-        plan_type: "Local Preferred Provider Organization",
-        county: "Duval County",
-        region: "region-1"
+        organization: 'Aetna Medicare',
+        product_type: 'MAPD',
+        plan_type: 'Local Preferred Provider Organization',
+        county: 'Duval County',
+        region: 'region-1'
       },
       {
-        organization: "BayCare Health Plans",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Polk County",
-        region: "region-1"
+        organization: 'BayCare Health Plans',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Polk County',
+        region: 'region-1'
       },
       {
-        organization: "Florida Blue HMO",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Bay County",
-        region: "region-1"
+        organization: 'Florida Blue HMO',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Bay County',
+        region: 'region-1'
       },
       {
-        organization: "UnitedHealthcare",
-        product_type: "MAPD",
-        plan_type: "Local Preferred Provider Organization",
-        county: "Bay County",
-        region: "region-1"
+        organization: 'UnitedHealthcare',
+        product_type: 'MAPD',
+        plan_type: 'Local Preferred Provider Organization',
+        county: 'Bay County',
+        region: 'region-1'
       },
       {
-        organization: "BayCare Health Plans",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Pasco County",
-        region: "region-1"
+        organization: 'BayCare Health Plans',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Pasco County',
+        region: 'region-1'
       },
       {
-        organization: "BayCare Health Plans",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Pinellas County",
-        region: "region-2"
+        organization: 'BayCare Health Plans',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Pinellas County',
+        region: 'region-2'
       },
       {
-        organization: "Florida Blue",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Pasco County",
-        region: "region-1"
+        organization: 'Florida Blue',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Pasco County',
+        region: 'region-1'
       },
       {
-        organization: "Florida Blue",
-        product_type: "MAPD",
-        plan_type: "HMO",
-        county: "Osceola County",
-        region: "region-1"
+        organization: 'Florida Blue',
+        product_type: 'MAPD',
+        plan_type: 'HMO',
+        county: 'Osceola County',
+        region: 'region-1'
       },
       {
-        organization: "Florida Blue",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Lee County",
-        region: "region-2"
+        organization: 'Florida Blue',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Lee County',
+        region: 'region-2'
       },
       {
-        organization: "Florida Blue",
-        product_type: "SNP",
-        plan_type: "PPO",
-        county: "Lake County",
-        region: "region-2"
+        organization: 'Florida Blue',
+        product_type: 'SNP',
+        plan_type: 'PPO',
+        county: 'Lake County',
+        region: 'region-2'
       },
       {
-        organization: "UnitedHealthcare",
-        product_type: "MA",
-        plan_type: "PPO",
-        county: "Charlotte County",
-        region: "region-1"
+        organization: 'UnitedHealthcare',
+        product_type: 'MA',
+        plan_type: 'PPO',
+        county: 'Charlotte County',
+        region: 'region-1'
       },
       {
-        organization: "Aetna Medicare",
-        product_type: "MAPD",
-        plan_type: "Local Preferred Provider Organization",
-        county: "Duval County",
-        region: "region-1"
+        organization: 'Aetna Medicare',
+        product_type: 'MAPD',
+        plan_type: 'Local Preferred Provider Organization',
+        county: 'Duval County',
+        region: 'region-1'
       }
     ];
 
@@ -341,15 +367,9 @@ class GlobalFilter extends Component {
       region: [],
       product_type: [],
       plan_type: [],
-      categories: [
-        "organization",
-        "county",
-        "region",
-        "product_type",
-        "plan_type"
-      ],
-      presets:[],
-      selectedCategory: "organization",
+      categories: ['organization', 'county', 'region', 'product_type', 'plan_type'],
+      presets: [{ name: 'Preset One', id: '1' }, { name: 'Preset One', id: '2' }],
+      selectedCategory: 'organization',
       unSelectedFiltersObj: {},
       selectedFilter: []
     };
@@ -389,17 +409,11 @@ class GlobalFilter extends Component {
     this.setState({ selectedCategory: category });
   };
 
-  categoryItemSelectionChangeHandler = (
-    category,
-    categoryValue,
-    isItemSelected
-  ) => {
+  categoryItemSelectionChangeHandler = (category, categoryValue, isItemSelected) => {
     const isSelected = !isItemSelected;
     const tmpCategory = this.state[category];
     // finding the categoryValue selected in the unique category set for checking or unchecking
-    const foundCategory = tmpCategory.find(
-      item => item.value === categoryValue
-    );
+    const foundCategory = tmpCategory.find(item => item.value === categoryValue);
     foundCategory.isSelected = isSelected;
     this.setState({ [category]: tmpCategory });
 
@@ -430,10 +444,7 @@ class GlobalFilter extends Component {
     const whereClause = {};
     this.state.selectedFilter.forEach(sf => {
       if (whereClause.hasOwnProperty(sf.category) === true) {
-        whereClause[sf.category] = [
-          ...whereClause[sf.category],
-          sf.categoryVal
-        ];
+        whereClause[sf.category] = [...whereClause[sf.category], sf.categoryVal];
       } else {
         whereClause[sf.category] = [sf.categoryVal];
       }
@@ -463,11 +474,7 @@ class GlobalFilter extends Component {
         updatedCategories[categoryField] = this.state[categoryField];
         if (category !== categoryField) {
           for (let ci of updatedCategories[categoryField]) {
-            if (
-              distinctAvailableCategories[categoryField].hasOwnProperty(
-                ci.value
-              )
-            ) {
+            if (distinctAvailableCategories[categoryField].hasOwnProperty(ci.value)) {
               ci.isDisabled = false;
             } else {
               ci.isDisabled = true;
@@ -493,12 +500,35 @@ class GlobalFilter extends Component {
     }
   };
 
+  presetsClickHandler = () => {
+    this.setState({ selectedCategory: 'presets' });
+  };
+
+  presetEditClickHandler = preset => {};
+
+  presetDeleteClickHandler = preset => {};
+
+  createNewPresetButtonClickHandler = () => {
+    const presets = [
+      ...this.state.presets,
+      {
+        id: new Date().getTime(),
+        name: new Date().getTime().toString(),
+        filters: this.state.selectedFilter
+      }
+    ];
+    console.log({ presets });
+    this.setState({ presets });
+  };
+
   clearFilterClickHandler = () => {
     const uniqueCategoriesItems = {};
     this.state.categories.forEach(categoryField => {
-      uniqueCategoriesItems[categoryField] = this.state[categoryField].map(
-        ci => ({ ...ci, isSelected: false, isDisabled: false })
-      );
+      uniqueCategoriesItems[categoryField] = this.state[categoryField].map(ci => ({
+        ...ci,
+        isSelected: false,
+        isDisabled: false
+      }));
     });
     this.setState({
       ...uniqueCategoriesItems,
@@ -518,11 +548,7 @@ class GlobalFilter extends Component {
       <Fragment>
         <div className={classes.Filtericon} onClick={() => this.handleDrawer()}>
           Filters&nbsp;
-          <FontAwesomeIcon
-            icon={faTimes}
-            style={{ margin: 3 }}
-            aria-hidden="true"
-          />
+          <FontAwesomeIcon icon={faTimes} style={{ margin: 3 }} aria-hidden="true" />
         </div>
 
         <Drawer
@@ -532,8 +558,8 @@ class GlobalFilter extends Component {
           PaperProps={{
             style: {
               width: drawerWidth,
-              padding: "15px",
-              overflow: "auto"
+              padding: '15px',
+              overflow: 'auto'
             }
           }}
         >
@@ -547,13 +573,9 @@ class GlobalFilter extends Component {
           </div>
 
           <div className={classes.FilterBody}>
-            {this.props.enableMemberSearch ? <div> member search</div> : ""}
-            {this.props.enableDateSearch ? <div> Date search</div> : ""}
-            {this.props.enableMonthRangeSearch ? (
-              <div> Month range search</div>
-            ) : (
-              ""
-            )}
+            {this.props.enableMemberSearch ? <div> member search</div> : ''}
+            {this.props.enableDateSearch ? <div> Date search</div> : ''}
+            {this.props.enableMonthRangeSearch ? <div> Month range search</div> : ''}
 
             <div className={classes.globalFilterContainer}>
               <div className={classes.topContainer}>
@@ -563,59 +585,99 @@ class GlobalFilter extends Component {
                       key={category}
                       className={
                         classes.leftContainerItem +
-                        " " +
-                        (this.state.selectedCategory === category
-                          ? classes.selectedCategory
-                          : "")
+                        ' ' +
+                        (this.state.selectedCategory === category ? classes.selectedCategory : '')
                       }
                       onClick={this.categoryClickHandler.bind(this, category)}
                     >
                       {category}
                     </div>
                   ))}
+                  <Divider />
+                  <div
+                    className={
+                      classes.leftContainerItem +
+                      ' ' +
+                      (this.state.selectedCategory === 'presets' ? classes.selectedCategory : '')
+                    }
+                    onClick={this.presetsClickHandler}
+                  >
+                    Presets
+                  </div>
                 </div>
                 <div className={classes.rightContainer}>
-                  {this.state[this.state.selectedCategory].map(categoryItem => {
-                    return (
-                      <div
-                        key={categoryItem.value}
-                        className={
-                          classes.rightContainerItem +
-                          " " +
-                          (categoryItem.isDisabled
-                            ? classes.categoryItemDisabled
-                            : " ")
-                        }
-                        onClick={this.categoryItemSelectionChangeHandler.bind(
-                          this,
-                          this.state.selectedCategory,
-                          categoryItem.value,
-                          categoryItem.isSelected
-                        )}
-                      >
-                        <span>{categoryItem.value}</span>
-                        {categoryItem.isSelected ? (
-                          <FontAwesomeIcon icon={faCheck} aria-hidden="true" />
-                        ) : (
-                          ""
-                        )}
+                  {this.state.selectedCategory === 'presets' ? (
+                    <List>
+                      {this.state.presets.map(preset => {
+                        return (
+                          <ListItem button key={preset.id} className={classes.presetListItem}>
+                            <span>{preset.name}</span>
+                            <div className={classes.presetListItemIConContainer}>
+                              <FontAwesomeIcon
+                                icon={faEdit}
+                                aria-hidden="true"
+                                className={classes.presetEditIcon}
+                                onClick={this.presetEditClickHandler.bind(this, preset)}
+                              />
+                              <FontAwesomeIcon
+                                icon={faTrashAlt}
+                                aria-hidden="true"
+                                className={classes.presetDeleteIcon}
+                                onClick={this.presetDeleteClickHandler.bind(this, preset)}
+                              />
+                            </div>
+                          </ListItem>
+                        );
+                      })}
+                      <div button className={classes.presetListItemCreateNewPreset}>
+                        <Button
+                          color="primary"
+                          className={classes.presetListItemCreateNewPresetButton}
+                          onClick={this.createNewPresetButtonClickHandler}
+                        >
+                          Create New Preset
+                        </Button>
                       </div>
-                    );
-                  })}
+                    </List>
+                  ) : (
+                    <div>
+                      {this.state[this.state.selectedCategory].map(categoryItem => {
+                        return (
+                          <div
+                            key={categoryItem.value}
+                            className={
+                              classes.rightContainerItem +
+                              ' ' +
+                              (categoryItem.isDisabled ? classes.categoryItemDisabled : ' ')
+                            }
+                            onClick={this.categoryItemSelectionChangeHandler.bind(
+                              this,
+                              this.state.selectedCategory,
+                              categoryItem.value,
+                              categoryItem.isSelected
+                            )}
+                          >
+                            <span>{categoryItem.value}</span>
+                            {categoryItem.isSelected ? (
+                              <FontAwesomeIcon icon={faCheck} aria-hidden="true" />
+                            ) : (
+                              ''
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className={classes.bottomContainer}>
                 {this.state.selectedFilter.map(sf => {
-                  return !this.state.unSelectedFiltersObj[
-                    `${sf.category}###${sf.categoryVal}`
-                  ] ? (
+                  return !this.state.unSelectedFiltersObj[`${sf.category}###${sf.categoryVal}`] ? (
                     <div
                       className={classes.selectedFilterChipContainer}
                       key={sf.categoryVal + sf.category}
                     >
-                      <div className={classes.selectedFilterChipLabel}>
-                        {sf.categoryVal}
-                      </div>
+                      <div className={classes.selectedFilterChipLabel}>{sf.categoryVal}</div>
                       <FontAwesomeIcon
                         className={classes.selectedFilterChipIcon}
                         onClick={this.categoryItemSelectionChangeHandler.bind(
@@ -629,19 +691,19 @@ class GlobalFilter extends Component {
                       />
                     </div>
                   ) : (
-                    ""
+                    ''
                   );
                 })}
               </div>
             </div>
 
-            <div style={{ justifyContent: "flex-end", display: "flex" }}>
+            <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
               <Button
                 variant="contained"
                 style={{
-                  backgroundColor: "grey",
-                  color: "white",
-                  marginRight: "16px"
+                  backgroundColor: 'grey',
+                  color: 'white',
+                  marginRight: '16px'
                 }}
                 className={classes.button}
                 onClick={this.clearFilterClickHandler}
@@ -650,7 +712,7 @@ class GlobalFilter extends Component {
               </Button>
               <Button
                 variant="contained"
-                style={{ backgroundColor: "#009fae", color: "white" }}
+                style={{ backgroundColor: '#009fae', color: 'white' }}
                 className={classes.button}
                 onClick={this.applyFilterClickHandler}
               >
@@ -664,8 +726,6 @@ class GlobalFilter extends Component {
   }
 }
 
-const GlobalFilterWrapped = withStyles(styles, { withTheme: true })(
-  GlobalFilter
-);
+const GlobalFilterWrapped = withStyles(styles, { withTheme: true })(GlobalFilter);
 
 export default GlobalFilterWrapped;
