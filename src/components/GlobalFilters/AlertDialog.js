@@ -1,14 +1,22 @@
-import React from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { withStyles } from '@material-ui/styles';
+import React from 'react';
 
-export default function AlertDialog(props) {
+const styles = theme => ({
+  PresetDialog: {
+    width: '600px',
+    left: 'auto !important'
+  }
+});
+
+function AlertDialog(props) {
+  const { classes } = props;
   const [open, setOpen] = React.useState(props.open);
-  //const [openProps, setOpenProps ] = React.useProps(props.open);
 
   React.useEffect(() => {
     console.log('count changed', props.open);
@@ -32,6 +40,7 @@ export default function AlertDialog(props) {
       <Dialog
         open={open}
         onClose={handleClose}
+        className={classes.PresetDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -51,3 +60,6 @@ export default function AlertDialog(props) {
     </div>
   );
 }
+
+const AlertDialogThemed = withStyles(styles, { withTheme: true })(AlertDialog);
+export default AlertDialogThemed;

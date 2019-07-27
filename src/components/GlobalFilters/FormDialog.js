@@ -1,13 +1,12 @@
-import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import { withStyles } from '@material-ui/styles';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/styles';
+import React, { Component } from 'react';
 
 const styles = theme => ({
   PresetDialog: {
@@ -30,8 +29,8 @@ class FormDialog extends Component {
   };
 
   handleClose = () => {
-    console.log('cancel clicked');
     this.setState({ open: false });
+    this.props.updatePresetHandler(this.state.presetName, this.props.id, false);
   };
 
   presetNameChangeHandler = e => {
@@ -40,7 +39,7 @@ class FormDialog extends Component {
 
   handleSave = () => {
     if (this.props.mode === 'openEdit') {
-      this.props.updatePresetHandler(this.state.presetName, this.props.id);
+      this.props.updatePresetHandler(this.state.presetName, this.props.id, true);
     } else {
       this.props.createPresetHandler(this.state.presetName);
     }
@@ -57,15 +56,6 @@ class FormDialog extends Component {
     }
   }
 
-  //   static getDerivedStateFromProps(props, state) {
-  //     console.log(state);
-  //     if (props.mode === 'openEdit' && state.open === false) {
-  //       return { presetName: props.presetName, open: true };
-  //     } else {
-  //       return null;
-  //     }
-  //   }
-
   render() {
     const { classes } = this.props;
     return (
@@ -74,7 +64,7 @@ class FormDialog extends Component {
           disabled={this.props.disableCreatePresetBtn}
           variant="outlined"
           color="primary"
-          onClick={this.handleClickOpen}
+          onClick={this.handleClickOpen.bind(this, 'openCreate')}
         >
           Create New Preset
         </Button>

@@ -114,6 +114,9 @@ const styles = theme => ({
     padding: '16px'
   },
   presetListItemIConContainer: {},
+  presetItemLabel: {
+    flex: '1'
+  },
   presetDeleteIcon: {
     cursor: 'pointer'
   },
@@ -447,63 +450,7 @@ class GlobalFilter extends Component {
       this.state.selectedFilter.splice(foundIndex, 1); //need to change as we directly changing the state
     }
 
-    const whereClause = {};
-    this.state.selectedFilter.forEach(sf => {
-      if (whereClause.hasOwnProperty(sf.category) === true) {
-        whereClause[sf.category] = [...whereClause[sf.category], sf.categoryVal];
-      } else {
-        whereClause[sf.category] = [sf.categoryVal];
-      }
-    });
-
-    let tmpFilteredData = JSON.parse(JSON.stringify(this.state.data));
-    tmpFilteredData = taffy
-      .taffy(tmpFilteredData)(whereClause)
-      .get();
-
-    const distinctAvailableCategories = {};
-
-    this.state.categories.forEach(categoryField => {
-      distinctAvailableCategories[categoryField] = {};
-    });
-
-    tmpFilteredData.forEach(item => {
-      this.state.categories.forEach(categoryField => {
-        distinctAvailableCategories[categoryField][item[categoryField]] = true;
-      });
-    });
-
-    let unSelectedFiltersObj = {};
-    const updatedCategories = {};
-    if (this.state.selectedFilter.length > 0) {
-      this.state.categories.forEach(categoryField => {
-        updatedCategories[categoryField] = this.state[categoryField];
-        if (category !== categoryField) {
-          for (let ci of updatedCategories[categoryField]) {
-            if (distinctAvailableCategories[categoryField].hasOwnProperty(ci.value)) {
-              ci.isDisabled = false;
-            } else {
-              ci.isDisabled = true;
-              unSelectedFiltersObj[`${categoryField}###${ci.value}`] = true;
-            }
-          }
-        }
-      });
-
-      this.setState({ ...updatedCategories, unSelectedFiltersObj });
-    }
-
-    if (this.state.selectedFilter.length === 0) {
-      const uniqueCategoriesItems = {};
-      this.state.categories.forEach(categoryField => {
-        uniqueCategoriesItems[categoryField] = this.state[categoryField];
-        uniqueCategoriesItems[categoryField].forEach(curCatoryItem => {
-          curCatoryItem.isDisabled = false;
-        });
-      });
-
-      this.setState(uniqueCategoriesItems);
-    }
+    this.filterData(category);
   };
 
   presetsClickHandler = () => {
@@ -520,12 +467,14 @@ class GlobalFilter extends Component {
     });
   };
 
-  updatePresettSaveBtnClickHandler = (updatedPresetName, id) => {
-    const presets = this.state.presets;
-    const preset = presets.find(item => item.id === id);
-    if (preset) {
-      preset.name = updatedPresetName;
-      this.setState({ presets });
+  updatePresettSaveBtnClickHandler = (updatedPresetName, id, status) => {
+    if (status === true) {
+      const presets = this.state.presets;
+      const preset = presets.find(item => item.id === id);
+      if (preset) {
+        preset.name = updatedPresetName;
+        this.setState({ presets });
+      }
     }
 
     this.setState({ formDialogMode: '' });
@@ -541,15 +490,31 @@ class GlobalFilter extends Component {
     });
   };
 
-  createPresetSaveBtnClickHandler = presetName => {
-    const presets = [
-      ...this.state.presets,
-      {
-        id: new Date().getTime(),
-        name: presetName,
-        filters: this.state.selectedFilter
+  deletePresetHandler = (status, a) => {
+    console.log('delete preset handler');
+    if (status === 'ok') {
+      const presets = this.state.presets;
+      const presetIndex = presets.findIndex(item => item.id === this.state.curPresetId);
+      if (presetIndex !== -1) {
+        presets.splice(presetIndex, 1);
+        this.setState({ presets });
       }
-    ];
+    }
+
+    this.setState({ openAlertDialog: false });
+  };
+
+  createPresetSaveBtnClickHandler = presetName => {
+    const presets = JSON.parse(
+      JSON.stringify([
+        ...this.state.presets,
+        {
+          id: new Date().getTime(),
+          name: presetName,
+          filters: this.state.selectedFilter
+        }
+      ])
+    );
     this.setState({ presets });
   };
 
@@ -569,23 +534,67 @@ class GlobalFilter extends Component {
     });
   };
 
-  deletePresetHandler = (status, a) => {
-    console.log('delete preset handler');
-    if (status === 'ok') {
-      const presets = this.state.presets;
-      const presetIndex = presets.findIndex(item => item.id === this.state.curPresetId);
-      if (presetIndex !== -1) {
-        presets.splice(presetIndex, 1);
-        this.setState({ presets });
-      }
-    }
-
-    this.setState({ openAlertDialog: false });
+  presetItemClickHandler = (preset, event) => {
+    this.setState({ selectedFilter: preset.filters }, () => {
+      this.filterData(preset.filters[0].category);
+    });
   };
 
   handleDrawer = () => {
     this.setState({ globalFilterOpen: !this.state.globalFilterOpen });
   };
+
+  filterData(category) {
+    const whereClause = {};
+    this.state.selectedFilter.forEach(sf => {
+      if (whereClause.hasOwnProperty(sf.category) === true) {
+        whereClause[sf.category] = [...whereClause[sf.category], sf.categoryVal];
+      } else {
+        whereClause[sf.category] = [sf.categoryVal];
+      }
+    });
+    let tmpFilteredData = JSON.parse(JSON.stringify(this.state.data));
+    tmpFilteredData = taffy
+      .taffy(tmpFilteredData)(whereClause)
+      .get();
+    const distinctAvailableCategories = {};
+    this.state.categories.forEach(categoryField => {
+      distinctAvailableCategories[categoryField] = {};
+    });
+    tmpFilteredData.forEach(item => {
+      this.state.categories.forEach(categoryField => {
+        distinctAvailableCategories[categoryField][item[categoryField]] = true;
+      });
+    });
+    let unSelectedFiltersObj = {};
+    const updatedCategories = {};
+    if (this.state.selectedFilter.length > 0) {
+      this.state.categories.forEach(categoryField => {
+        updatedCategories[categoryField] = this.state[categoryField];
+        if (category !== categoryField) {
+          for (let ci of updatedCategories[categoryField]) {
+            if (distinctAvailableCategories[categoryField].hasOwnProperty(ci.value)) {
+              ci.isDisabled = false;
+            } else {
+              ci.isDisabled = true;
+              unSelectedFiltersObj[`${categoryField}###${ci.value}`] = true;
+            }
+          }
+        }
+      });
+      this.setState({ ...updatedCategories, unSelectedFiltersObj });
+    }
+    if (this.state.selectedFilter.length === 0) {
+      const uniqueCategoriesItems = {};
+      this.state.categories.forEach(categoryField => {
+        uniqueCategoriesItems[categoryField] = this.state[categoryField];
+        uniqueCategoriesItems[categoryField].forEach(curCatoryItem => {
+          curCatoryItem.isDisabled = false;
+        });
+      });
+      this.setState(uniqueCategoriesItems);
+    }
+  }
 
   render() {
     const { globalFilterOpen } = this.state;
@@ -657,7 +666,12 @@ class GlobalFilter extends Component {
                       {this.state.presets.map(preset => {
                         return (
                           <ListItem button key={preset.id} className={classes.presetListItem}>
-                            <span>{preset.name}</span>
+                            <span
+                              className={classes.presetItemLabel}
+                              onClick={this.presetItemClickHandler.bind(this, preset)}
+                            >
+                              {preset.name}
+                            </span>
                             <div className={classes.presetListItemIConContainer}>
                               <FontAwesomeIcon
                                 icon={faEdit}
@@ -686,8 +700,8 @@ class GlobalFilter extends Component {
                           createPresetHandler={presetName =>
                             this.createPresetSaveBtnClickHandler(presetName)
                           }
-                          updatePresetHandler={(updatedPresetName, id) => {
-                            this.updatePresettSaveBtnClickHandler(updatedPresetName, id);
+                          updatePresetHandler={(updatedPresetName, id, status) => {
+                            this.updatePresettSaveBtnClickHandler(updatedPresetName, id, status);
                           }}
                         />
                         <AlertDialog
