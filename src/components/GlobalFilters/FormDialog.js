@@ -30,6 +30,7 @@ class FormDialog extends Component {
   };
 
   handleClose = () => {
+    console.log('cancel clicked');
     this.setState({ open: false });
   };
 
@@ -52,9 +53,18 @@ class FormDialog extends Component {
         this.setState({ presetName: nextProps.presetName }, () => {
           this.handleClickOpen();
         });
-      }, 1000);
+      }, 0);
     }
   }
+
+  //   static getDerivedStateFromProps(props, state) {
+  //     console.log(state);
+  //     if (props.mode === 'openEdit' && state.open === false) {
+  //       return { presetName: props.presetName, open: true };
+  //     } else {
+  //       return null;
+  //     }
+  //   }
 
   render() {
     const { classes } = this.props;

@@ -14,6 +14,7 @@ import ListItem from '@material-ui/core/ListItem';
 import { withStyles } from '@material-ui/styles';
 import React, { Component, Fragment } from 'react';
 import FormDialog from './FormDialog';
+import AlertDialog from './AlertDialog';
 
 const taffy = require('./taffy');
 
@@ -375,7 +376,8 @@ class GlobalFilter extends Component {
       selectedFilter: [],
       currentPresetName: '',
       curPresetId: '',
-      formDialogMode: false
+      formDialogMode: false,
+      openAlertDialog: false
     };
   }
 
@@ -509,6 +511,8 @@ class GlobalFilter extends Component {
   };
 
   presetEditClickHandler = preset => {
+    console.log('TCL: GlobalFilter -> presetEditClickHandler -> preset', preset);
+
     this.setState({
       formDialogMode: 'openEdit',
       currentPresetName: preset.name,
@@ -523,9 +527,19 @@ class GlobalFilter extends Component {
       preset.name = updatedPresetName;
       this.setState({ presets });
     }
+
+    this.setState({ formDialogMode: '' });
   };
 
-  presetDeleteClickHandler = preset => {};
+  presetDeleteClickHandler = preset => {
+    console.log('TCL: GlobalFilter -> presetDeleteClickHandler -> preset', preset);
+
+    this.setState({
+      openAlertDialog: true,
+      currentPresetName: preset.name,
+      curPresetId: preset.id
+    });
+  };
 
   createPresetSaveBtnClickHandler = presetName => {
     const presets = [
@@ -553,6 +567,20 @@ class GlobalFilter extends Component {
       selectedFilter: [],
       unSelectedFiltersObj: {}
     });
+  };
+
+  deletePresetHandler = (status, a) => {
+    console.log('delete preset handler');
+    if (status === 'ok') {
+      const presets = this.state.presets;
+      const presetIndex = presets.findIndex(item => item.id === this.state.curPresetId);
+      if (presetIndex !== -1) {
+        presets.splice(presetIndex, 1);
+        this.setState({ presets });
+      }
+    }
+
+    this.setState({ openAlertDialog: false });
   };
 
   handleDrawer = () => {
@@ -661,6 +689,14 @@ class GlobalFilter extends Component {
                           updatePresetHandler={(updatedPresetName, id) => {
                             this.updatePresettSaveBtnClickHandler(updatedPresetName, id);
                           }}
+                        />
+                        <AlertDialog
+                          title="Delete Preset"
+                          description={`Are you sure you want to delete preset ${
+                            this.state.currentPresetName
+                          }`}
+                          open={this.state.openAlertDialog}
+                          deletePreset={status => this.deletePresetHandler(status)}
                         />
                       </div>
                     </List>
