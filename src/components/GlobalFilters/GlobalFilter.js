@@ -86,6 +86,8 @@ const styles = theme => ({
     color: 'red'
   },
   rightContainer: {
+    maxHeight: 'calc(100vh - 550px)',
+    overflowY: 'auto',
     width: '70%',
     margin: '0 5px',
     display: 'flex',
@@ -95,7 +97,7 @@ const styles = theme => ({
   rightContainerItem: {
     minHeight: '40px',
     lineHeight: '40px',
-    border: '1px solid #ccc',
+    // border: '1px solid #ccc',
     padding: '0 15px',
     cursor: 'pointer',
     display: 'flex',
@@ -112,6 +114,30 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     padding: '16px'
+  },
+  searchField: {
+    outline: 'none',
+    cursor: 'pointer',
+    display: 'block',
+    padding: '0 15px',
+    lineHeight: '40px',
+    width: '100%',
+    fontSize: '1rem',
+    boxSizing: 'border-box',
+    border: '0',
+    '-webkit-box-shadow': '0px 1px 4px 0px rgba(0,0,0,0.38)',
+    '-moz-box-shadow': '0px 1px 4px 0px rgba(0,0,0,0.38)',
+    'box-shadow': '0px 1px 4px 0px rgba(0,0,0,0.38)'
+  },
+  selectAll: {
+    cursor: 'pointer',
+    display: 'block',
+    padding: '0 15px',
+    lineHeight: '40px',
+    width: '100%',
+    fontSize: '1rem',
+    boxSizing: 'border-box',
+    border: '0'
   },
   presetListItemIConContainer: {},
   presetItemLabel: {
@@ -380,7 +406,8 @@ class GlobalFilter extends Component {
       currentPresetName: '',
       curPresetId: '',
       formDialogMode: false,
-      openAlertDialog: false
+      openAlertDialog: false,
+      categoryItemSearchToken: ''
     };
   }
 
@@ -407,7 +434,8 @@ class GlobalFilter extends Component {
         .map(item => ({
           value: item,
           isSelected: false,
-          isDisabled: false
+          isDisabled: false,
+          isIncludedInSearched: true
         }));
     });
 
@@ -415,7 +443,15 @@ class GlobalFilter extends Component {
   };
 
   categoryClickHandler = category => {
-    this.setState({ selectedCategory: category });
+    this.setState(
+      {
+        categoryItemSearchToken: ''
+      },
+      () => {
+        this.handleSearch();
+        this.setState({ selectedCategory: category });
+      }
+    );
   };
 
   categoryItemSelectionChangeHandler = (category, categoryValue, isItemSelected) => {
@@ -453,8 +489,98 @@ class GlobalFilter extends Component {
     this.filterData(category);
   };
 
+  filterData(category) {
+    const whereClause = {};
+    this.state.selectedFilter.forEach(sf => {
+      if (whereClause.hasOwnProperty(sf.category) === true) {
+        whereClause[sf.category] = [...whereClause[sf.category], sf.categoryVal];
+      } else {
+        whereClause[sf.category] = [sf.categoryVal];
+      }
+    });
+    let tmpFilteredData = JSON.parse(JSON.stringify(this.state.data));
+    tmpFilteredData = taffy
+      .taffy(tmpFilteredData)(whereClause)
+      .get();
+    const distinctAvailableCategories = {};
+    this.state.categories.forEach(categoryField => {
+      distinctAvailableCategories[categoryField] = {};
+    });
+    tmpFilteredData.forEach(item => {
+      this.state.categories.forEach(categoryField => {
+        distinctAvailableCategories[categoryField][item[categoryField]] = true;
+      });
+    });
+    let unSelectedFiltersObj = {};
+    const updatedCategories = {};
+    if (this.state.selectedFilter.length > 0) {
+      this.state.categories.forEach(categoryField => {
+        updatedCategories[categoryField] = this.state[categoryField];
+        if (category !== categoryField) {
+          for (let ci of updatedCategories[categoryField]) {
+            if (distinctAvailableCategories[categoryField].hasOwnProperty(ci.value)) {
+              ci.isDisabled = false;
+            } else {
+              ci.isDisabled = true;
+              unSelectedFiltersObj[`${categoryField}###${ci.value}`] = true;
+            }
+          }
+        }
+      });
+      this.setState({ ...updatedCategories, unSelectedFiltersObj });
+    }
+    if (this.state.selectedFilter.length === 0) {
+      const uniqueCategoriesItems = {};
+      this.state.categories.forEach(categoryField => {
+        uniqueCategoriesItems[categoryField] = this.state[categoryField];
+        uniqueCategoriesItems[categoryField].forEach(curCatoryItem => {
+          curCatoryItem.isDisabled = false;
+        });
+      });
+      this.setState(uniqueCategoriesItems);
+    }
+  }
+
+  searchTextChangeHandler = event => {
+    event.persist();
+    this.setState(
+      {
+        categoryItemSearchToken: event.target.value
+      },
+      () => {
+        this.handleSearch();
+      }
+    );
+  };
+
+  handleSearch = () => {
+    let categoryItems = this.state[this.state.selectedCategory];
+    let searchToken = this.state.categoryItemSearchToken;
+    if (searchToken) {
+      searchToken = searchToken.toLowerCase();
+      categoryItems.forEach(item => {
+        item['isIncludedInSearched'] = item.value.toLowerCase().includes(searchToken);
+      });
+    } else {
+      categoryItems.forEach(item => {
+        item['isIncludedInSearched'] = true;
+      });
+    }
+    this.setState({
+      [this.state.selectedCategory]: categoryItems
+    });
+  };
+
   presetsClickHandler = () => {
-    this.setState({ selectedCategory: 'presets' });
+    this.setState(
+      {
+        categoryItemSearchToken: ''
+      },
+      () => {
+        this.handleSearch();
+        this.setState({ selectedCategory: 'presets' });
+      }
+    );
   };
 
   presetEditClickHandler = preset => {
@@ -543,58 +669,6 @@ class GlobalFilter extends Component {
   handleDrawer = () => {
     this.setState({ globalFilterOpen: !this.state.globalFilterOpen });
   };
-
-  filterData(category) {
-    const whereClause = {};
-    this.state.selectedFilter.forEach(sf => {
-      if (whereClause.hasOwnProperty(sf.category) === true) {
-        whereClause[sf.category] = [...whereClause[sf.category], sf.categoryVal];
-      } else {
-        whereClause[sf.category] = [sf.categoryVal];
-      }
-    });
-    let tmpFilteredData = JSON.parse(JSON.stringify(this.state.data));
-    tmpFilteredData = taffy
-      .taffy(tmpFilteredData)(whereClause)
-      .get();
-    const distinctAvailableCategories = {};
-    this.state.categories.forEach(categoryField => {
-      distinctAvailableCategories[categoryField] = {};
-    });
-    tmpFilteredData.forEach(item => {
-      this.state.categories.forEach(categoryField => {
-        distinctAvailableCategories[categoryField][item[categoryField]] = true;
-      });
-    });
-    let unSelectedFiltersObj = {};
-    const updatedCategories = {};
-    if (this.state.selectedFilter.length > 0) {
-      this.state.categories.forEach(categoryField => {
-        updatedCategories[categoryField] = this.state[categoryField];
-        if (category !== categoryField) {
-          for (let ci of updatedCategories[categoryField]) {
-            if (distinctAvailableCategories[categoryField].hasOwnProperty(ci.value)) {
-              ci.isDisabled = false;
-            } else {
-              ci.isDisabled = true;
-              unSelectedFiltersObj[`${categoryField}###${ci.value}`] = true;
-            }
-          }
-        }
-      });
-      this.setState({ ...updatedCategories, unSelectedFiltersObj });
-    }
-    if (this.state.selectedFilter.length === 0) {
-      const uniqueCategoriesItems = {};
-      this.state.categories.forEach(categoryField => {
-        uniqueCategoriesItems[categoryField] = this.state[categoryField];
-        uniqueCategoriesItems[categoryField].forEach(curCatoryItem => {
-          curCatoryItem.isDisabled = false;
-        });
-      });
-      this.setState(uniqueCategoriesItems);
-    }
-  }
 
   render() {
     const { globalFilterOpen } = this.state;
@@ -716,6 +790,14 @@ class GlobalFilter extends Component {
                     </List>
                   ) : (
                     <div>
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        value={this.state.categoryItemSearchToken}
+                        className={classes.searchField}
+                        onChange={this.searchTextChangeHandler}
+                      />
+                      <div className={classes.selectAll}>Select All</div>
                       {this.state[this.state.selectedCategory].map(categoryItem => {
                         return (
                           <div
@@ -723,7 +805,9 @@ class GlobalFilter extends Component {
                             className={
                               classes.rightContainerItem +
                               ' ' +
-                              (categoryItem.isDisabled ? classes.categoryItemDisabled : ' ')
+                              (categoryItem.isDisabled || !categoryItem.isIncludedInSearched
+                                ? classes.categoryItemDisabled
+                                : ' ')
                             }
                             onClick={this.categoryItemSelectionChangeHandler.bind(
                               this,
