@@ -1,5 +1,6 @@
 import {
   faCheck,
+  faCheckDouble,
   faEdit,
   faTimes,
   faTimesCircle,
@@ -13,8 +14,8 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import { withStyles } from '@material-ui/styles';
 import React, { Component, Fragment } from 'react';
-import FormDialog from './FormDialog';
 import AlertDialog from './AlertDialog';
+import FormDialog from './FormDialog';
 
 const taffy = require('./taffy');
 
@@ -86,13 +87,15 @@ const styles = theme => ({
     color: 'red'
   },
   rightContainer: {
-    maxHeight: 'calc(100vh - 550px)',
-    overflowY: 'auto',
     width: '70%',
     margin: '0 5px',
     display: 'flex',
     flexDirection: 'column',
     border: '1px solid #ccc'
+  },
+  categoryItemContainer: {
+    overflowY: 'auto',
+    maxHeight: 'calc(100vh - 450px)'
   },
   rightContainerItem: {
     minHeight: '40px',
@@ -129,7 +132,7 @@ const styles = theme => ({
     '-moz-box-shadow': '0px 1px 4px 0px rgba(0,0,0,0.38)',
     'box-shadow': '0px 1px 4px 0px rgba(0,0,0,0.38)'
   },
-  selectAll: {
+  selectAllContainer: {
     cursor: 'pointer',
     display: 'block',
     padding: '0 15px',
@@ -137,7 +140,18 @@ const styles = theme => ({
     width: '100%',
     fontSize: '1rem',
     boxSizing: 'border-box',
-    border: '0'
+    border: '0',
+    display: 'grid',
+    gridTemplateColumns: '1fr 50px',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  selectAllLabel: {
+    fontWeight: '500'
+  },
+  selectAllIcon: {
+    justifySelf: 'end',
+    margin: '0'
   },
   presetListItemIConContainer: {},
   presetItemLabel: {
@@ -407,7 +421,8 @@ class GlobalFilter extends Component {
       curPresetId: '',
       formDialogMode: false,
       openAlertDialog: false,
-      categoryItemSearchToken: ''
+      categoryItemSearchToken: '',
+      isAllCategoryItemSelected: false
     };
   }
 
@@ -487,6 +502,12 @@ class GlobalFilter extends Component {
     }
 
     this.filterData(category);
+
+    if (isSelected === false) {
+      this.setState({
+        isAllCategoryItemSelected: false
+      });
+    }
   };
 
   filterData(category) {
@@ -529,6 +550,7 @@ class GlobalFilter extends Component {
       });
       this.setState({ ...updatedCategories, unSelectedFiltersObj });
     }
+
     if (this.state.selectedFilter.length === 0) {
       const uniqueCategoriesItems = {};
       this.state.categories.forEach(categoryField => {
@@ -569,6 +591,47 @@ class GlobalFilter extends Component {
     this.setState({
       [this.state.selectedCategory]: categoryItems
     });
+  };
+
+  selectAllClickHandler = () => {
+    const categoryField = this.state.selectedCategory;
+    const categoryItems = this.state[categoryField];
+    const selectedFilter = this.state.selectedFilter;
+
+    if (this.state.isAllCategoryItemSelected === true) {
+      categoryItems.forEach(item => {
+        if (item.isDisabled === false && item.isSelected === true) {
+          item.isSelected = false;
+          const foundIndex = selectedFilter.findIndex(
+            sf => sf.categoryVal === item.value && sf.category === categoryField
+          );
+          if (foundIndex !== -1) {
+            selectedFilter.splice(foundIndex, 1);
+          }
+        }
+      });
+    } else {
+      categoryItems.forEach(item => {
+        if (item.isDisabled === false && item.isSelected === false) {
+          item.isSelected = true;
+          selectedFilter.push({
+            category: categoryField,
+            categoryVal: item.value
+          });
+        }
+      });
+    }
+
+    this.setState(
+      {
+        [categoryField]: categoryItems,
+        isAllCategoryItemSelected: !this.state.isAllCategoryItemSelected,
+        selectedFilter
+      },
+      () => {
+        this.filterData(this.state.selectedCategory);
+      }
+    );
   };
 
   presetsClickHandler = () => {
@@ -797,34 +860,50 @@ class GlobalFilter extends Component {
                         className={classes.searchField}
                         onChange={this.searchTextChangeHandler}
                       />
-                      <div className={classes.selectAll}>Select All</div>
-                      {this.state[this.state.selectedCategory].map(categoryItem => {
-                        return (
-                          <div
-                            key={categoryItem.value}
-                            className={
-                              classes.rightContainerItem +
-                              ' ' +
-                              (categoryItem.isDisabled || !categoryItem.isIncludedInSearched
-                                ? classes.categoryItemDisabled
-                                : ' ')
-                            }
-                            onClick={this.categoryItemSelectionChangeHandler.bind(
-                              this,
-                              this.state.selectedCategory,
-                              categoryItem.value,
-                              categoryItem.isSelected
-                            )}
-                          >
-                            <span>{categoryItem.value}</span>
-                            {categoryItem.isSelected ? (
-                              <FontAwesomeIcon icon={faCheck} aria-hidden="true" />
-                            ) : (
-                              ''
-                            )}
-                          </div>
-                        );
-                      })}
+                      <div
+                        className={classes.selectAllContainer}
+                        onClick={this.selectAllClickHandler}
+                      >
+                        <span className={classes.selectAllLabel}>Select All</span>
+                        {this.state.isAllCategoryItemSelected ? (
+                          <FontAwesomeIcon
+                            icon={faCheckDouble}
+                            className={classes.selectAllIcon}
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          ''
+                        )}
+                      </div>
+                      <div className={classes.categoryItemContainer}>
+                        {this.state[this.state.selectedCategory].map(categoryItem => {
+                          return (
+                            <div
+                              key={categoryItem.value}
+                              className={
+                                classes.rightContainerItem +
+                                ' ' +
+                                (categoryItem.isDisabled || !categoryItem.isIncludedInSearched
+                                  ? classes.categoryItemDisabled
+                                  : ' ')
+                              }
+                              onClick={this.categoryItemSelectionChangeHandler.bind(
+                                this,
+                                this.state.selectedCategory,
+                                categoryItem.value,
+                                categoryItem.isSelected
+                              )}
+                            >
+                              <span>{categoryItem.value}</span>
+                              {categoryItem.isSelected ? (
+                                <FontAwesomeIcon icon={faCheck} aria-hidden="true" />
+                              ) : (
+                                ''
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
